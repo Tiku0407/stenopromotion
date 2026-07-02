@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>छत्तीसगढ़ मंत्रालय — पदक्रम विश्लेषण Dashboard (01.04.2026)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#20261f; --paper:#f7f6f0; --card:#ffffff;
+  --green:#1b5e3c; --green-dk:#123f28; --green-lt:#e6efe9;
+  --saffron:#c76b00; --saffron-lt:#fdf1e2;
+  --red:#a13333; --red-lt:#f9e9e9;
+  --blue:#2b4f81; --blue-lt:#e8eef7;
+  --line:#d8d5c8; --muted:#6b7266;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Mukta','Nirmala UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55}
+h1,h2,h3,.disp{font-family:'Tiro Devanagari Hindi','Nirmala UI',serif}
+
+/* Header */
+header{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;padding:26px 20px 20px;border-bottom:4px solid var(--saffron)}
+.hwrap{max-width:1150px;margin:0 auto}
+header .eyebrow{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+header h1{font-size:1.7rem;font-weight:400;margin:4px 0 2px}
+header .sub{font-size:.92rem;opacity:.9}
+.stamp{display:inline-block;margin-top:10px;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:3px 12px;font-size:.82rem;background:rgba(255,255,255,.08)}
+
+/* Tabs */
+nav{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.tabs{max-width:1150px;margin:0 auto;display:flex;overflow-x:auto}
+.tab{padding:13px 18px;border:none;background:none;font:inherit;font-size:.95rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--green)}
+.tab.active{color:var(--green);border-bottom-color:var(--saffron)}
+.tab:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+
+main{max-width:1150px;margin:0 auto;padding:22px 16px 70px}
+section{display:none}section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px}
+.card h2{font-size:1.25rem;color:var(--green-dk);margin-bottom:4px}
+.card .note{font-size:.85rem;color:var(--muted);margin-bottom:12px}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:var(--radius);padding:12px 14px}
+.kpi .n{font-size:1.7rem;font-weight:700;color:var(--green-dk)}
+.kpi .l{font-size:.82rem;color:var(--muted)}
+.kpi.warn{border-left-color:var(--saffron)}.kpi.warn .n{color:var(--saffron)}
+.kpi.alert{border-left-color:var(--red)}.kpi.alert .n{color:var(--red)}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--green-lt);color:var(--green-dk);text-align:left;padding:8px 10px;border:1px solid var(--line);font-weight:700}
+td{padding:7px 10px;border:1px solid var(--line);vertical-align:top}
+tr:nth-child(even) td{background:#fbfaf6}
+.tblwrap{overflow-x:auto}
+.badge{display:inline-block;padding:1px 9px;border-radius:20px;font-size:.75rem;font-weight:600;white-space:nowrap}
+.b-green{background:var(--green-lt);color:var(--green-dk)}
+.b-saf{background:var(--saffron-lt);color:var(--saffron)}
+.b-red{background:var(--red-lt);color:var(--red)}
+.b-blue{background:var(--blue-lt);color:var(--blue)}
+.bar{height:10px;border-radius:6px;background:#eceadf;overflow:hidden;min-width:90px}
+.bar>i{display:block;height:100%;background:var(--green)}
+.me td{background:#f2f7ed !important;box-shadow:inset 3px 0 0 var(--saffron)}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px}
+.controls label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:3px}
+.controls input,.controls select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;min-width:130px}
+.controls input:focus,.controls select:focus{outline:2px solid var(--green);border-color:var(--green)}
+button.btn{font:inherit;font-weight:600;background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer}
+button.btn:hover{background:var(--green-dk)}
+button.btn:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+
+/* Timeline */
+.yeargrp{margin-bottom:16px}
+.yeargrp h3{display:flex;align-items:center;gap:10px;font-size:1.05rem;color:var(--green-dk);margin-bottom:8px}
+.yeargrp h3 .cnt{font-family:'Mukta';font-size:.78rem;background:var(--saffron-lt);color:var(--saffron);border-radius:20px;padding:1px 10px;font-weight:700}
+.tl-item{display:flex;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:6px;flex-wrap:wrap;align-items:center}
+.tl-date{font-weight:700;color:var(--red);min-width:105px;font-size:.88rem}
+.tl-name{font-weight:600;min-width:190px}
+.tl-meta{font-size:.82rem;color:var(--muted)}
+.empty{padding:16px;text-align:center;color:var(--muted);font-size:.9rem;background:#fbfaf6;border:1px dashed var(--line);border-radius:8px}
+
+/* Chain */
+.chainyr{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);margin-bottom:14px;overflow:hidden}
+.chainyr>h3{background:var(--green-lt);padding:9px 16px;font-size:1.05rem;color:var(--green-dk)}
+.chainyr .body{padding:12px 16px}
+.step{padding:7px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.step:last-child{border-bottom:none}
+.arrow{color:var(--saffron);font-weight:700}
+
+/* Upload */
+.drop{border:2px dashed var(--green);border-radius:var(--radius);background:var(--green-lt);padding:34px;text-align:center;cursor:pointer;transition:background .2s}
+.drop:hover,.drop.over{background:#d8e8de}
+.drop p{color:var(--green-dk);font-weight:600}
+.drop small{color:var(--muted)}
+#pdfout{white-space:pre-wrap;font-size:.8rem;background:#fbfaf6;border:1px solid var(--line);border-radius:8px;padding:12px;max-height:340px;overflow:auto;margin-top:12px;display:none}
+
+footer{max-width:1150px;margin:0 auto;padding:14px 16px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--line)}
+@media(max-width:640px){header h1{font-size:1.3rem}.tl-name{min-width:0}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="hwrap">
+  <div class="eyebrow">सामान्य प्रशासन विभाग · छत्तीसगढ़ मंत्रालय, महानदी भवन</div>
+  <h1>पदक्रम सूची विश्लेषण Dashboard</h1>
+  <div class="sub">स्टॉफ ऑफिसर · निज सचिव · निज सहायक · शीघ्रलेखक · स्टेनो टाइपिस्ट संवर्ग — Retirement एवं Promotion Projection</div>
+  <span class="stamp">📋 अंतिम पदक्रम सूची — दिनांक 01.04.2026 की स्थिति में (ESTB-107(3)/47/2025-GAD-8)</span>
+ </div>
+</header>
+
+<nav><div class="tabs">
+ <button class="tab active" data-t="overview">📊 Cadre Overview</button>
+ <button class="tab" data-t="retire">⏳ Retirement Timeline</button>
+ <button class="tab" data-t="pso">🎯 पद पूर्ति Projection</button>
+ <button class="tab" data-t="chain">📈 Promotion Chain</button>
+ <button class="tab" data-t="search">🔍 Officer खोजें</button>
+ <button class="tab" data-t="upload">📄 नया PDF Upload</button>
+</div></nav>
+
+<main>
+
+<!-- ================= OVERVIEW ================= -->
+<section id="overview" class="active">
+ <div class="kpis" id="kpirow"></div>
+ <div class="card">
+  <h2>संवर्ग-वार पद स्थिति</h2>
+  <div class="note">स्वीकृत पद vs भरे पद — रिक्तियाँ promotion के अवसर दर्शाती हैं</div>
+  <div class="tblwrap"><table id="cadreTbl">
+   <thead><tr><th>संवर्ग</th><th>Pay Level</th><th>स्वीकृत</th><th>भरे</th><th>रिक्त</th><th>भरे पद %</th></tr></thead>
+   <tbody></tbody>
+  </table></div>
+ </div>
+ <div class="card">
+  <h2>मुख्य निष्कर्ष (Key Insights)</h2>
+  <div id="insights"></div>
+ </div>
+</section>
+
+<!-- ================= RETIREMENT ================= -->
+<section id="retire">
+ <div class="card">
+  <h2>Retirement Timeline</h2>
+  <div class="note">
+   <strong>नियम:</strong> सेवानिवृत्ति आयु <span id="raLabel">62</span> वर्ष।
+   यदि जन्मतिथि महीने की <strong>1 तारीख</strong> है → retirement <strong>पिछले महीने के अंतिम दिन</strong>;
+   अन्यथा → उसी महीने के <strong>अंतिम दिन</strong>।
+  </div>
+  <div class="controls">
+   <div><label for="raInput">Retirement आयु (वर्ष)</label><input type="number" id="raInput" value="62" min="55" max="65"></div>
+   <div><label for="raCadre">संवर्ग filter</label><select id="raCadre"><option value="">सभी संवर्ग</option></select></div>
+   <div><label for="raTill">कब तक दिखाएँ</label><select id="raTill">
+     <option value="2030">2030 तक</option><option value="2035" selected>2035 तक</option>
+     <option value="2040">2040 तक</option><option value="2099">सभी</option></select></div>
+   <button class="btn" id="raGo">Update करें</button>
+  </div>
+  <div id="tlOut"></div>
+ </div>
+</section>
+
+<!-- ================= PSO ================= -->
+<section id="pso">
+ <div class="card">
+  <h2>पद पूर्ति Projection — सभी संवर्ग</h2>
+  <div class="note">प्रत्येक संवर्ग की <strong>पदक्रम सूची (वरिष्ठता क्रमांक)</strong> के अनुसार अगले संवर्ग में पदोन्नति की पात्रता स्थिति।
+   <strong>निर्धारित अर्हता:</strong> SSO → PSO व SO → SSO हेतु 03 वर्ष; निज सचिव → SO, निज सहायक → निज सचिव, शीघ्रलेखक → निज सहायक, स्टेनो टाइपिस्ट → शीघ्रलेखक हेतु 05 वर्ष सेवा अवधि।
+   PSO (Level 15, 37400–67000 + GP 8700) के 03 स्वीकृत पद हैं — SSO seniority से भरे जाएँगे।</div>
+  <div class="controls">
+   <div><label for="psoYear">मूल्यांकन वर्ष</label><input type="number" id="psoYear" value="2029" min="2026" max="2045"></div>
+   <div><label for="psoPosts">PSO स्वीकृत पद</label><input type="number" id="psoPosts" value="3" min="1" max="6"></div>
+   <button class="btn" id="psoGo">Projection देखें</button>
+  </div>
+  <div id="psoOut"></div>
+ </div>
+</section>
+
+<!-- ================= CHAIN ================= -->
+<section id="chain">
+ <div class="card">
+  <h2>Promotion Chain Projection (Year-by-Year)</h2>
+  <div class="note">
+   <strong>Logic:</strong> प्रत्येक वर्ष के retirements + मौजूदा रिक्तियों से ऊपर के संवर्ग में पद खाली होते हैं → नीचे के संवर्ग से सबसे senior <em>पात्र</em> officer promote होता है → उसकी जगह और नीचे से भरती है।
+   <br><strong>निर्धारित अर्हता (सेवा अवधि):</strong>
+   <span class="badge b-green">SSO → PSO : 03 वर्ष</span>
+   <span class="badge b-green">SO → SSO : 03 वर्ष</span>
+   <span class="badge b-saf">निज सचिव → SO : 05 वर्ष</span>
+   <span class="badge b-saf">निज सहायक → निज सचिव : 05 वर्ष</span>
+   <span class="badge b-saf">शीघ्रलेखक → निज सहायक : 05 वर्ष</span>
+   <span class="badge b-saf">स्टेनो टाइपिस्ट → शीघ्रलेखक : 05 वर्ष</span>
+   <br>Chain क्रम:
+   <span class="badge b-blue">स्टेनो टाइपिस्ट → शीघ्रलेखक → निज सहायक → निज सचिव → स्टॉफ ऑफिसर → वरिष्ठ स्टॉफ ऑफिसर → PSO (2029 से)</span>
+   <br>यह seniority-आधारित <em>indicative projection</em> है — वास्तविक पदोन्नति DPC, ACR/APAR, roster एवं विभागीय नियमों पर निर्भर करेगी।
+  </div>
+  <div class="controls">
+   <div><label for="chTill">Projection अवधि</label><select id="chTill">
+    <option value="2030">2026–2030</option><option value="2035" selected>2026–2035</option><option value="2040">2026–2040</option><option value="2045">2026–2045</option></select></div>
+   <button class="btn" id="chGo">Projection चलाएँ</button>
+  </div>
+  <div id="chainOut"></div>
+ </div>
+</section>
+
+<!-- ================= SEARCH ================= -->
+<section id="search">
+ <div class="card">
+  <h2>Officer खोजें एवं Filter करें</h2>
+  <div class="controls">
+   <div><label for="q">नाम / पदस्थापना</label><input type="text" id="q" placeholder="जैसे: रावटे, गृह, वित्त..."></div>
+   <div><label for="fCadre">संवर्ग</label><select id="fCadre"><option value="">सभी</option></select></div>
+   <div><label for="fDist">गृह जिला</label><select id="fDist"><option value="">सभी</option></select></div>
+  </div>
+  <div class="tblwrap"><table id="offTbl">
+   <thead><tr><th>क्र.</th><th>नाम</th><th>संवर्ग</th><th>जन्मतिथि</th><th>संवर्ग नियुक्ति</th><th>गृह जिला</th><th>Retirement</th><th>वर्तमान पदस्थापना</th></tr></thead>
+   <tbody></tbody>
+  </table></div>
+ </div>
+</section>
+
+<!-- ================= UPLOAD ================= -->
+<section id="upload">
+ <div class="card">
+  <h2>नई पदक्रम सूची PDF Upload करें</h2>
+  <div class="note">भविष्य की सूची (जैसे 01.04.2027) आने पर यहाँ upload करें — text extract होकर नीचे दिखेगा, जिससे data update करने में आसानी होगी। (Text-based PDF चाहिए; scanned image PDF से text नहीं निकलेगा।)</div>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDF upload करें">
+   <p>📄 PDF यहाँ drag करें या click करके चुनें</p>
+   <small>फ़ाइल आपके browser में ही process होगी — कहीं upload नहीं होगी</small>
+   <input type="file" id="fileIn" accept="application/pdf" hidden>
+  </div>
+  <div id="pdfout"></div>
+ </div>
+</section>
+
+</main>
+<footer>स्रोत: सामान्य प्रशासन विभाग, छ.ग. शासन — अंतिम पदक्रम सूची दिनांक 01.04.2026 (जारी: 18.06.2026) · यह tool केवल विश्लेषण/projection हेतु है, आधिकारिक अभिलेख नहीं। · gad.cg.gov.in</footer>
+
+<script>
+/* ============ DATA (PDF दिनांक 01.04.2026 से extract) ============ */
+/* dob: DD-MM-YY | cd: संवर्ग में नियुक्ति दिनांक | post: वर्तमान पदस्थापना */
+const CADRES = [
+ {key:"PSO", name:"प्रधान स्टॉफ ऑफिसर", level:"15 (37400–67000 + GP 8700)", sanctioned:3, filled:0},
+ {key:"SSO", name:"वरिष्ठ स्टॉफ ऑफिसर", level:"14 (15600–39100 + GP 7600)", sanctioned:6, filled:6},
+ {key:"SO",  name:"स्टॉफ ऑफिसर", level:"13 (15600–39100 + GP 6600)", sanctioned:12, filled:12},
+ {key:"NS",  name:"निज सचिव", level:"11 (9300–34800 + GP 4800)", sanctioned:30, filled:28},
+ {key:"NSA", name:"निज सहायक", level:"09 (9300–34800 + GP 4300)", sanctioned:27, filled:22},
+ {key:"SL",  name:"शीघ्रलेखक", level:"07 (5200–20200 + GP 2800)", sanctioned:54, filled:12},
+ {key:"ST",  name:"स्टेनो टाइपिस्ट", level:"04 (5200–20200 + GP 1900)", sanctioned:62, filled:31},
+];
+const OFF = [
+/* SSO */
+{c:"SSO",n:1,nm:"श्री धनंजय मिश्रा",dob:"01-05-67",cd:"30-01-26",d:"बालाघाट",j:"सामान्य",p:"संयुक्त सचिव, स्कूल शिक्षा"},
+{c:"SSO",n:2,nm:"श्री शेख सलीम अंसारी",dob:"16-03-71",cd:"29-01-26",d:"छिंदवाड़ा",j:"सामान्य",p:"सचिव, मान. मुख्यमंत्री"},
+{c:"SSO",n:3,nm:"श्री राजदेव राम लकड़ा",dob:"01-05-70",cd:"29-01-26",d:"सरगुजा",j:"अ.ज.जा.",p:"सचिव, समाज कल्याण"},
+{c:"SSO",n:4,nm:"श्री शैलेन्द्र कुमार बोरकर",dob:"20-09-77",cd:"29-01-26",d:"बालाघाट",j:"अ.जा.",p:"सचिव, नगरीय प्रशासन"},
+{c:"SSO",n:5,nm:"श्री हरीश उईके",dob:"13-10-68",cd:"29-01-26",d:"बस्तर",j:"अ.ज.जा.",p:"सचिव, जल संसाधन"},
+{c:"SSO",n:6,nm:"श्री संतोष कुमार पवार",dob:"25-12-70",cd:"03-03-26",d:"रायसेन",j:"सामान्य",p:"अपर मुख्य सचिव, पंचायत"},
+/* SO */
+{c:"SO",n:1,nm:"श्री राजेश कुमार हीरा",dob:"01-07-64",cd:"03-11-17",d:"जबलपुर",j:"सामान्य",p:"सचिव, गृह"},
+{c:"SO",n:2,nm:"श्रीमती अंजू सिंग",dob:"17-05-73",cd:"30-05-20",d:"रायगढ़",j:"अ.ज.जा.",p:"सचिव, ग्रामोद्योग"},
+{c:"SO",n:3,nm:"श्री दिलीप सिंह परते",dob:"12-02-67",cd:"30-05-20",d:"बालाघाट",j:"अ.ज.जा.",p:"विशेष सचिव, राजस्व"},
+{c:"SO",n:4,nm:"श्रीमती सुषमा तिग्गा",dob:"18-07-69",cd:"01-06-20",d:"रायगढ़",j:"अ.ज.जा.",p:"सचिव, मान. मुख्यमंत्री"},
+{c:"SO",n:5,nm:"श्री कमल कुमार तिवारी",dob:"07-07-64",cd:"01-06-20",d:"रायपुर",j:"सामान्य",p:"सचिव, पंचायत एवं ग्रामीण विकास"},
+{c:"SO",n:6,nm:"श्री रंजित लकड़ा",dob:"09-10-75",cd:"20-11-24",d:"सरगुजा",j:"अ.ज.जा.",p:"विशेष सचिव, वित्त विभाग"},
+{c:"SO",n:7,nm:"श्री बिजेश कुमार वर्मा",dob:"18-10-66",cd:"29-01-26",d:"रायपुर",j:"सामान्य",p:"सचिव, मान. मुख्यमंत्री"},
+{c:"SO",n:8,nm:"श्री मोहन दास साहू",dob:"04-01-71",cd:"29-01-26",d:"राजनांदगांव",j:"पि.वर्ग",p:"लोक भवन सचिवालय (प्रति.)"},
+{c:"SO",n:9,nm:"श्री महेन्द्र बागड़े",dob:"15-06-71",cd:"29-01-26",d:"भोपाल",j:"अ.जा.",p:"लोक भवन सचिवालय (प्रति.)"},
+{c:"SO",n:10,nm:"श्रीमती सुभागनी क.एक्का",dob:"12-03-80",cd:"06-03-26",d:"जशपुर",j:"अ.ज.जा.",p:"संयुक्त सचिव, इले. एवं सूचना प्रौद्यो."},
+{c:"SO",n:11,nm:"श्री जग्गूराम नेताम",dob:"09-11-76",cd:"29-01-26",d:"धमतरी",j:"अ.ज.जा.",p:"संयुक्त सचिव, राजस्व"},
+{c:"SO",n:12,nm:"श्री सतीश कुमार ठाकुर",dob:"10-07-83",cd:"03-03-26",d:"दुर्ग",j:"अ.ज.जा.",p:"सचिव, खेल एवं युवा कल्याण"},
+/* निज सचिव */
+{c:"NS",n:1,nm:"श्री जगदीश नारायण कोष्टा",dob:"28-06-74",cd:"14-09-11",d:"जबलपुर",j:"सामान्य",p:"सचिव, संसदीय कार्य",np:true},
+{c:"NS",n:2,nm:"श्री सैयद जाकिर अली",dob:"16-09-75",cd:"07-02-18",d:"हरदा",j:"सामान्य",p:"सचिव, कृषि वि. एवं कि. कल्याण"},
+{c:"NS",n:3,nm:"श्री संजय कनाठे",dob:"28-07-69",cd:"19-04-21",d:"बैतूल",j:"पि.वर्ग",p:"सचिव, पर्यटन"},
+{c:"NS",n:4,nm:"श्री नितिन रामेकर",dob:"10-07-72",cd:"10-05-21",d:"रायपुर",j:"पि.वर्ग",p:"प्रमुख सचिव, गृह"},
+{c:"NS",n:5,nm:"श्री राजेश ओझा",dob:"16-05-78",cd:"19-04-21",d:"रायपुर",j:"सामान्य",p:"सचिव, आवास एवं पर्यावरण"},
+{c:"NS",n:6,nm:"श्री ओम प्रकाश श्रीवास्तव",dob:"22-08-81",cd:"31-01-22",d:"रायपुर",j:"सामान्य",p:"सचिव, लोक निर्माण विभाग"},
+{c:"NS",n:7,nm:"श्री आत्म प्रकाश सिन्हा",dob:"14-10-75",cd:"28-01-22",d:"रायपुर",j:"सामान्य",p:"उप सचिव, गृह विभाग"},
+{c:"NS",n:8,nm:"श्रीमती प्रतिमा पोटभरे",dob:"13-06-78",cd:"27-01-22",d:"दुर्ग",j:"सामान्य",p:"सचिव, लोक स्वास्थ्य यांत्रिकी"},
+{c:"NS",n:9,nm:"श्री चमन लाल ठाकुर",dob:"02-05-81",cd:"02-01-23",d:"बालोद",j:"अ.ज.जा.",p:"संयुक्त सचिव, खेल"},
+{c:"NS",n:10,nm:"श्री विकास शर्मा",dob:"15-09-76",cd:"03-01-23",d:"दुर्ग",j:"सामान्य",p:"सचिव, मान. मुख्यमंत्री"},
+{c:"NS",n:11,nm:"श्री हितेन्द्र तन्ना",dob:"09-08-72",cd:"03-01-23",d:"दुर्ग",j:"सामान्य",p:"मान. सांसद, रायपुर"},
+{c:"NS",n:12,nm:"श्री हरीश कुमार टंडन",dob:"20-10-81",cd:"31-01-24",d:"दुर्ग",j:"अ.जा.",p:"प्रमुख सचिव, महिला एवं बाल विकास"},
+{c:"NS",n:13,nm:"श्री छबिलाल साहू",dob:"15-03-81",cd:"31-01-24",d:"धमतरी",j:"पि.वर्ग",p:"सचिव, पंचायत विभाग"},
+{c:"NS",n:14,nm:"श्रीमती दमयन्ती साहू",dob:"19-09-84",cd:"21-11-24",d:"दुर्ग",j:"पि.वर्ग",p:"सचिव, ग्रामोद्योग"},
+{c:"NS",n:15,nm:"श्रीमती नूतन चंद्रवंशी",dob:"18-12-80",cd:"21-11-24",d:"रायपुर",j:"अ.ज.जा.",p:"संयुक्त सचिव, पर्य. एवं संस्कृति"},
+{c:"NS",n:16,nm:"श्रीमती पिंकी सोनवानी",dob:"01-01-80",cd:"21-11-24",d:"राजनांदगांव",j:"अ.जा.",p:"सचिव, सहकारिता"},
+{c:"NS",n:17,nm:"श्री धनंजय कुमार वर्मा",dob:"11-10-76",cd:"21-11-24",d:"रायपुर",j:"पि.वर्ग",p:"प्रमुख सचिव, गृह"},
+{c:"NS",n:18,nm:"श्री भैरव नारायण विश्वकर्मा",dob:"10-07-79",cd:"03-02-25",d:"रायपुर",j:"पि.वर्ग",p:"सचिव, खेल एवं युवा कल्याण"},
+{c:"NS",n:19,nm:"श्री टीकूराम रावटे",dob:"04-07-81",cd:"03-02-25",d:"बालोद",j:"अ.ज.जा.",p:"सचिव, लोक स्वास्थ्य एवं परि.",me:true},
+{c:"NS",n:20,nm:"कु. अनिता मरकाम",dob:"20-10-81",cd:"03-02-25",d:"दंतेवाड़ा",j:"अ.ज.जा.",p:"सचिव, वाणिज्य एवं उद्योग"},
+{c:"NS",n:21,nm:"श्री मनहरण लाल धृतलहरे",dob:"30-06-74",cd:"03-02-25",d:"बिलासपुर",j:"अ.जा.",p:"सचिव, जल संसाधन"},
+{c:"NS",n:22,nm:"श्रीमती सोनाली ठाकुर",dob:"14-09-79",cd:"03-02-25",d:"रायपुर",j:"अ.ज.जा.",p:"सचिव, स्कूल शिक्षा"},
+{c:"NS",n:23,nm:"श्रीमती पुष्पा दामले",dob:"01-01-65",cd:"05-08-25",d:"राजनांदगांव",j:"अ.जा.",p:"सामान्य प्रशासन विभाग (पूल)"},
+{c:"NS",n:24,nm:"श्री वोनित कुमार वर्मा",dob:"26-06-76",cd:"29-01-26",d:"रायपुर",j:"अ.पि.व.",p:"सचिव, सा.प्र.वि."},
+{c:"NS",n:25,nm:"श्री चंदन कुमार गुप्ता",dob:"18-01-83",cd:"29-01-26",d:"सरगुजा",j:"सामान्य",p:"सामान्य प्रशासन विभाग (पूल)"},
+{c:"NS",n:26,nm:"श्रीमती टेकेश्वरी सिन्हा",dob:"28-04-88",cd:"29-01-26",d:"दुर्ग",j:"अ.पि.व.",p:"उप सचिव, लोक स्वा. यांत्रिकी"},
+{c:"NS",n:27,nm:"श्री प्रेमशंकर",dob:"20-03-85",cd:"29-01-26",d:"बालोद",j:"अ.ज.जा.",p:"विशेष सचिव, वन"},
+{c:"NS",n:28,nm:"श्री सुशांत पनका",dob:"03-08-89",cd:"29-01-26",d:"रायपुर",j:"अ.जा.",p:"प्रमुख सचिव, मान. मुख्यमंत्री"},
+/* निज सहायक */
+{c:"NSA",n:1,nm:"श्री भुवन डेकाटे",dob:"25-07-73",cd:"18-02-03",d:"राजनांदगांव",j:"अ.ज.जा.",p:"संयुक्त सचिव, वन",np:true},
+{c:"NSA",n:2,nm:"श्री धन्नूदास बुरडे",dob:"20-02-74",cd:"18-02-03",d:"राजनांदगांव",j:"अ.ज.जा.",p:"अपर मुख्य सचिव, गृह",np:true},
+{c:"NSA",n:3,nm:"श्री परमेश्वर कुमार",dob:"25-12-87",cd:"27-01-22",d:"दुर्ग",j:"अ.ज.जा.",p:"संयुक्त सचिव, वित्त"},
+{c:"NSA",n:4,nm:"श्रीमती सुधा साहू",dob:"05-03-82",cd:"27-01-22",d:"रायपुर",j:"सामान्य",p:"संयुक्त सचिव, परिवहन"},
+{c:"NSA",n:5,nm:"श्री दिनेश सिंह ठाकुर",dob:"01-02-80",cd:"27-01-22",d:"रायपुर",j:"सामान्य",p:"सचिव, गृह विभाग"},
+{c:"NSA",n:6,nm:"श्री जितेन्द्र कुमार",dob:"04-03-86",cd:"03-01-23",d:"दुर्ग",j:"अ.जा.",p:"सचिव, सा.प्र.वि."},
+{c:"NSA",n:7,nm:"श्री हितेश यादव",dob:"02-01-87",cd:"03-01-23",d:"रायपुर",j:"अ.पि.व.",p:"अपर मुख्य सचिव, गृह"},
+{c:"NSA",n:8,nm:"श्री रामाधार वर्मा",dob:"07-05-86",cd:"03-01-23",d:"कबीरधाम",j:"अ.पि.व.",p:"उप सचिव, खनिज"},
+{c:"NSA",n:9,nm:"श्री उमेश कुमार यादव",dob:"01-07-78",cd:"31-05-24",d:"रायपुर",j:"सामान्य",p:"उप सचिव, चिकित्सा शिक्षा"},
+{c:"NSA",n:10,nm:"श्री सौरभ वर्मा",dob:"10-11-89",cd:"31-01-24",d:"रायपुर",j:"अ.पि.व.",p:"संयुक्त सचिव, स्वास्थ्य"},
+{c:"NSA",n:11,nm:"श्री बसंत कुमार देवांगन",dob:"14-09-87",cd:"27-11-24",d:"दुर्ग",j:"अ.पि.व.",p:"सचिव, सहकारिता"},
+{c:"NSA",n:12,nm:"सुश्री उमा पटेल",dob:"04-03-89",cd:"21-11-24",d:"रायगढ़",j:"अ.पि.व.",p:"सचिव, वित्त"},
+{c:"NSA",n:13,nm:"श्रीमती नंदनी टण्डन",dob:"25-04-91",cd:"21-11-24",d:"रायपुर",j:"अ.जा.",p:"अपर मुख्य सचिव, पंचायत"},
+{c:"NSA",n:14,nm:"श्री राजेश कुमार गिरी",dob:"01-04-90",cd:"21-11-24",d:"रायपुर",j:"अ.जा.",p:"मुख्य सचिव कार्यालय"},
+{c:"NSA",n:15,nm:"श्री राम प्रसाद कंवर",dob:"29-07-82",cd:"21-11-24",d:"कोरबा",j:"अ.ज.जा.",p:"संयुक्त सचिव, वन"},
+{c:"NSA",n:16,nm:"सुश्री निशा पटेल",dob:"15-11-89",cd:"03-02-25",d:"जांजगीर-चांपा",j:"अ.पि.व.",p:"सचिव, खाद्य, नागरिक आ."},
+{c:"NSA",n:17,nm:"श्री दुष्यंत कुमार साहू",dob:"27-03-90",cd:"03-02-25",d:"रायपुर",j:"अ.पि.व.",p:"उप सचिव, सा.प्र.वि."},
+{c:"NSA",n:18,nm:"श्रीमती ज्योति बंजारे",dob:"17-04-86",cd:"03-02-25",d:"रायपुर",j:"अ.जा.",p:"उप सचिव, वाणिज्य एवं उद्यो."},
+{c:"NSA",n:19,nm:"श्रीमती भोज ठाकुर",dob:"29-09-90",cd:"03-02-25",d:"बालोद",j:"अ.ज.जा.",p:"सचिव, समाज कल्याण"},
+{c:"NSA",n:20,nm:"कु. प्रतिमा लकड़ा",dob:"16-06-88",cd:"04-02-25",d:"जशपुर",j:"अ.ज.जा.",p:"विशेष सचिव, उच्च शिक्षा"},
+{c:"NSA",n:21,nm:"श्री रामनाथ कोरी",dob:"25-05-81",cd:"05-08-25",d:"कबीरधाम",j:"अ.जा.",p:"संयुक्त सचिव, जनशिकायत"},
+/* शीघ्रलेखक */
+{c:"SL",n:1,nm:"कु. राधिका देवांगन",dob:"01-07-88",cd:"01-02-22",d:"दुर्ग",j:"अ.पि.व.",p:"उप सचिव, वित्त"},
+{c:"SL",n:2,nm:"श्री नवीन नाग",dob:"11-05-88",cd:"29-01-22",d:"जशपुर",j:"अ.ज.जा.",p:"सचिव, लोक निर्माण विभाग"},
+{c:"SL",n:3,nm:"श्री किशन कुमार",dob:"01-10-93",cd:"27-01-22",d:"बालोद",j:"अ.ज.जा.",p:"प्रमुख सचिव, मान. मुख्यमंत्री"},
+{c:"SL",n:4,nm:"श्री सागर देवांगन",dob:"14-05-97",cd:"05-10-23",d:"बिलासपुर",j:"अ.पि.व.",p:"उप सचिव, सा.प्र.वि."},
+{c:"SL",n:5,nm:"श्रीमती खुशबू देवांगन",dob:"14-06-98",cd:"05-10-23",d:"राजनांदगांव",j:"अ.पि.व.",p:"उप सचिव, नगरीय प्रशासन"},
+{c:"SL",n:6,nm:"श्री प्रवीण कुमार",dob:"26-02-97",cd:"05-10-23",d:"बालोद",j:"अ.पि.व.",p:"मुख्य सचिव कार्यालय"},
+{c:"SL",n:7,nm:"सुश्री अपूर्वा उज्जवलकर",dob:"03-04-99",cd:"05-10-23",d:"दुर्ग",j:"अ.पि.व.",p:"सचिव, मान. मुख्यमंत्री"},
+{c:"SL",n:8,nm:"श्री मानेन्द्र कुमार साहू",dob:"02-10-94",cd:"05-10-23",d:"बालोद",j:"अ.पि.व.",p:"प्रमुख सचिव, गृह विभाग"},
+{c:"SL",n:9,nm:"श्री टुकेश्वर",dob:"17-02-95",cd:"05-10-23",d:"बेमेतरा",j:"अ.पि.व.",p:"सचिव, पंचायत एवं ग्रामीण वि."},
+{c:"SL",n:10,nm:"श्री अनिल कुमार देवांगन",dob:"11-05-94",cd:"04-10-23",d:"बिलासपुर",j:"अ.पि.व.",p:"विशेष सचिव, वित्त"},
+{c:"SL",n:11,nm:"श्रीमती कुमुदिनी अलेन्द्र",dob:"14-09-98",cd:"05-10-23",d:"बालोद",j:"अ.ज.जा.",p:"उप सचिव, सा.प्र.वि."},
+{c:"SL",n:12,nm:"श्री लोकेन्द्र कुमार",dob:"13-04-97",cd:"06-10-23",d:"बालोद",j:"अ.जा.",p:"सचिव, श्रम"},
+/* स्टेनो टाइपिस्ट */
+{c:"ST",n:1,nm:"श्री भुवन लाल मरसकोले",dob:"03-04-79",cd:"30-08-08",d:"कांकेर",j:"अ.जा.",p:"सचिव, लोक स्वास्थ्य यांत्रिकी",np:true},
+{c:"ST",n:2,nm:"सुश्री रोशनी बंछोर",dob:"15-09-94",cd:"04-10-23",d:"दुर्ग",j:"अ.पि.व.",p:"सचिव, स्कूल शिक्षा विभाग"},
+{c:"ST",n:3,nm:"श्री रमाकांत",dob:"19-06-95",cd:"06-10-23",d:"बिलासपुर",j:"अ.पि.व.",p:"सचिव, पंचायत"},
+{c:"ST",n:4,nm:"श्री मुकेश गुप्ता",dob:"20-08-98",cd:"05-10-23",d:"रायगढ़",j:"अ.पि.व.",p:"सचिव, आवास एवं पर्यावरण"},
+{c:"ST",n:5,nm:"सुश्री आरती",dob:"25-04-99",cd:"06-10-23",d:"महासमुंद",j:"अ.पि.व.",p:"सचिव, ऊर्जा विभाग"},
+{c:"ST",n:6,nm:"श्री विष्णु प्रसाद",dob:"20-10-97",cd:"05-10-23",d:"बलौदाबाजार",j:"अ.ज.जा.",p:"सचिव, पर्यटन विभाग"},
+{c:"ST",n:7,nm:"श्री चंदेश कुमार गोस्वामी",dob:"10-10-95",cd:"04-10-23",d:"दुर्ग",j:"अ.पि.व.",p:"सचिव, नगरीय प्रशासन"},
+{c:"ST",n:8,nm:"सुश्री पूजा नायक",dob:"04-05-98",cd:"05-10-23",d:"सारंगढ़",j:"अ.पि.व.",p:"प्रमुख सचिव, आदिम जाति"},
+{c:"ST",n:9,nm:"श्री अरुण कुमार देवांगन",dob:"02-02-96",cd:"05-10-23",d:"खैरागढ़-छुईखदान-गंडई",j:"अ.पि.व.",p:"उप सचिव, सा.प्र.वि."},
+{c:"ST",n:10,nm:"श्री निखिल देवांगन",dob:"28-09-00",cd:"05-10-23",d:"बिलासपुर",j:"अ.पि.व.",p:"सचिव, वाणिज्य एवं उद्योग"},
+{c:"ST",n:11,nm:"श्री सुनील कुमार",dob:"08-02-92",cd:"06-10-23",d:"रायपुर",j:"अ.जा.",p:"अपर मुख्य सचिव, पंचायत"},
+{c:"ST",n:12,nm:"श्री रितेश बघले",dob:"18-04-00",cd:"05-10-23",d:"दुर्ग",j:"अ.पि.व.",p:"संयुक्त सचिव, सुशासन एवं अभि."},
+{c:"ST",n:13,nm:"श्रीमती जितेश्वरी देवांगन",dob:"09-08-95",cd:"06-10-23",d:"दुर्ग",j:"अ.पि.व.",p:"सा.प्र.वि. (पूल)"},
+{c:"ST",n:14,nm:"सुश्री सुमित्रा नाग",dob:"05-06-00",cd:"05-10-23",d:"जशपुर",j:"अ.ज.जा.",p:"सचिव, लोक स्वास्थ्य एवं परि."},
+{c:"ST",n:15,nm:"सुश्री भुवनेश्वरी कंवर",dob:"10-01-97",cd:"06-10-23",d:"बिलासपुर",j:"अ.ज.जा.",p:"अवर सचिव, मुख्यमंत्री सचिवालय"},
+{c:"ST",n:16,nm:"सुश्री राखी सिदार",dob:"25-08-98",cd:"04-10-23",d:"जशपुर",j:"अ.ज.जा.",p:"उप सचिव, सामान्य प्रशासन विभाग"},
+{c:"ST",n:17,nm:"श्री धनंजय गढ़ेवाल",dob:"14-04-93",cd:"04-10-23",d:"जांजगीर-चांपा",j:"अ.जा.",p:"विशेष सचिव, वाणिज्यिक कर (आब.)"},
+{c:"ST",n:18,nm:"श्रीमती तरुणा ध्रुव",dob:"12-06-95",cd:"04-10-23",d:"रायपुर",j:"अ.ज.जा.",p:"उप सचिव, सा.प्र.वि."},
+{c:"ST",n:19,nm:"श्री गुलाबचंद खरे",dob:"25-11-90",cd:"06-10-23",d:"मानपुर-मोहला-अंबागढ़ चौकी",j:"अ.ज.जा.",p:"मुख्यमंत्री सचिवालय"},
+{c:"ST",n:20,nm:"श्री नागेन्द्र सिंह",dob:"18-09-94",cd:"05-10-23",d:"बिलासपुर",j:"अ.ज.जा.",p:"सचिव, लोक निर्माण विभाग"},
+{c:"ST",n:21,nm:"श्री चरण सिंह",dob:"25-09-95",cd:"05-10-23",d:"गरियाबंद",j:"अ.ज.जा.",p:"सचिव, राजस्व एवं आपदा प्रबंधन"},
+{c:"ST",n:22,nm:"श्री स्वदेश गांधरला",dob:"03-05-93",cd:"06-10-23",d:"बीजापुर",j:"सामान्य",p:"सचिव, राजस्व एवं आपदा प्रबंधन"},
+{c:"ST",n:23,nm:"श्री गिरधारी सिंह राजपूत",dob:"18-11-97",cd:"07-12-23",d:"मुंगेली",j:"सामान्य",p:"सलाहकार, मान. मुख्यमंत्री की निजी स्थापना"},
+{c:"ST",n:24,nm:"श्री मुकेश कुमार",dob:"24-12-92",cd:"09-10-23",d:"कबीरधाम",j:"अ.पि.व.",p:"सचिव, कृषि विकास एवं कल्याण"},
+{c:"ST",n:25,nm:"श्री तमेन्द्र",dob:"15-01-96",cd:"06-10-23",d:"धमतरी",j:"अ.पि.व.",p:"सचिव, संसदीय कार्य"},
+{c:"ST",n:26,nm:"श्रीमती रूपमती देवांगन",dob:"19-10-90",cd:"06-10-23",d:"राजनांदगांव",j:"अ.पि.व.",p:"सचिव, वित्त"},
+{c:"ST",n:27,nm:"श्री अभिषेक कुमार",dob:"07-03-95",cd:"06-10-23",d:"बलौदाबाजार",j:"अ.जा.",p:"प्रमुख सचिव, महिला एवं बाल वि."},
+{c:"ST",n:28,nm:"श्री दिलराज सिंह कंवर",dob:"20-01-94",cd:"07-12-23",d:"कोरबा",j:"अ.ज.जा.",p:"सचिव, मान. मुख्यमंत्री"},
+{c:"ST",n:29,nm:"श्री चरण कुमार",dob:"20-07-96",cd:"04-10-24",d:"बालोद",j:"अ.पि.व.",p:"मान. मंत्री, पर्यटन एवं संस्कृति"},
+{c:"ST",n:30,nm:"सुश्री भावना यादव",dob:"05-05-99",cd:"10-10-24",d:"दुर्ग",j:"अ.पि.व.",p:"उप सचिव, राजस्व"},
+{c:"ST",n:31,nm:"श्री वीरेन्द्र",dob:"26-12-97",cd:"14-10-24",d:"कोरबा",j:"अ.ज.जा.",p:"सचिव, गृह"},
+];
+
+/* ============ HELPERS ============ */
+const CN = Object.fromEntries(CADRES.map(c=>[c.key,c.name]));
+const ORDER = ["ST","SL","NSA","NS","SO","SSO","PSO"];
+const M = ["जनवरी","फरवरी","मार्च","अप्रैल","मई","जून","जुलाई","अगस्त","सितम्बर","अक्टूबर","नवम्बर","दिसम्बर"];
+
+function parseDMY(s, isDob){ // "DD-MM-YY"
+  const [d,m,y] = s.split("-").map(Number);
+  let yy = y;
+  if (y < 100) yy = (isDob ? (y > 30 ? 1900+y : 2000+y) : (y > 90 ? 1900+y : 2000+y));
+  return {d,m,y:yy};
+}
+function lastDay(y,m){ return new Date(y, m, 0).getDate(); } // m: 1-12
+
+/* Retirement rule:
+   DOB day == 1  → last day of PREVIOUS month of (birth month, year dob.y + age)
+   otherwise     → last day of SAME month of (dob.y + age) */
+function retireDate(dobStr, age){
+  const dob = parseDMY(dobStr, true);
+  let y = dob.y + age, m = dob.m;
+  if (dob.d === 1){ m -= 1; if (m === 0){ m = 12; y -= 1; } }
+  return {y, m, d: lastDay(y,m)};
+}
+const fmtR = r => `${String(r.d).padStart(2,"0")} ${M[r.m-1]} ${r.y}`;
+const fmtDMY = s => { const p = parseDMY(s,true); return `${String(p.d).padStart(2,"0")}-${String(p.m).padStart(2,"0")}-${p.y}`; };
+const cdKey = s => { const p = parseDMY(s,false); return p.y*10000 + p.m*100 + p.d; };
+
+let RA = 62;
+function withRet(list){ return list.map(o => ({...o, ret: retireDate(o.dob, RA)})); }
+
+/* पदोन्नति हेतु निर्धारित सेवा अवधि (target संवर्ग के अनुसार, वर्तमान संवर्ग में) */
+const REQ = { PSO:3, SSO:3, SO:5, NS:5, NSA:5, SL:5 };
+function eligByYear(o, targetKey, y){ // वर्ष y (31 दिसम्बर तक) में पात्र?
+  if (o.np) return false; // promotion से बाहर रखे गए officers
+  const req = REQ[targetKey]||0;
+  const cd = parseDMY(o.cd, false);
+  return new Date(cd.y+req, cd.m-1, cd.d) <= new Date(y, 11, 31);
+}
+function eligDateStr(o, targetKey){
+  const req = REQ[targetKey]||0;
+  const cd = parseDMY(o.cd, false);
+  return `${String(cd.d).padStart(2,"0")}-${String(cd.m).padStart(2,"0")}-${cd.y+req}`;
+}
+
+/* ============ TABS ============ */
+document.querySelectorAll(".tab").forEach(b=>{
+ b.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.getElementById(b.dataset.t).classList.add("active");
+ });
+});
+
+/* ============ OVERVIEW ============ */
+function renderOverview(){
+ const totS = CADRES.reduce((a,c)=>a+c.sanctioned,0), totF = CADRES.reduce((a,c)=>a+c.filled,0);
+ const now = new Date(2026,3,1);
+ const soon = withRet(OFF).filter(o=>{ const rd=new Date(o.ret.y,o.ret.m-1,o.ret.d); return rd>=now && o.ret.y<=2029; }).length;
+ document.getElementById("kpirow").innerHTML = `
+  <div class="kpi"><div class="n">${totS}</div><div class="l">कुल स्वीकृत पद</div></div>
+  <div class="kpi"><div class="n">${totF}</div><div class="l">कुल भरे पद</div></div>
+  <div class="kpi warn"><div class="n">${totS-totF}</div><div class="l">कुल रिक्त पद</div></div>
+  <div class="kpi alert"><div class="n">${soon}</div><div class="l">Retirement (2026–2029)</div></div>`;
+
+ const tb = document.querySelector("#cadreTbl tbody");
+ tb.innerHTML = CADRES.map(c=>{
+  const pct = c.sanctioned ? Math.round(100*c.filled/c.sanctioned) : 0;
+  const vac = c.sanctioned - c.filled;
+  return `<tr><td><strong>${c.name}</strong>${c.key==="PSO"?' <span class="badge b-red">सभी रिक्त</span>':''}</td>
+   <td>${c.level}</td><td>${c.sanctioned}</td><td>${c.filled}</td>
+   <td>${vac>0?`<span class="badge b-saf">${vac}</span>`:'<span class="badge b-green">0</span>'}</td>
+   <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${pct}%"></i></div><span style="font-size:.8rem">${pct}%</span></div></td></tr>`;
+ }).join("");
+
+ document.getElementById("insights").innerHTML = `
+  <div class="step">🔴 <strong>प्रधान स्टॉफ ऑफिसर</strong> संवर्ग पूर्णतः रिक्त — projection अनुसार <strong>2029</strong> में SSO से पदोन्नति द्वारा भरा जाएगा।</div>
+  <div class="step">⚠️ <strong>शीघ्रलेखक</strong> में सर्वाधिक रिक्तियाँ (42/54) — निचले संवर्ग से पदोन्नति एवं सीधी भर्ती दोनों की गुंजाइश।</div>
+  <div class="step">⏳ <strong>2026 में ही</strong> स्टॉफ ऑफिसर संवर्ग के दो senior officer (श्री राजेश कुमार हीरा — 30 जून 2026, श्री कमल कुमार तिवारी — 31 जुलाई 2026) retire होंगे — SO में तत्काल रिक्तियाँ।</div>
+  <div class="step">📌 <strong>Promotion से बाहर:</strong> श्री जगदीश नारायण कोष्टा (निज सचिव क्र. 1), श्री भुवन डेकाटे व श्री धन्नूदास बुरडे (निज सहायक क्र. 1–2), श्री भुवन लाल मरसकोले (स्टेनो टाइपिस्ट क्र. 1) — projection में इनकी पदोन्नति नहीं दिखाई जाती; इनके नीचे के officers seniority क्रम में आगे बढ़ते हैं। श्री पुरुषोत्तम कोष्टा का प्रकरण मान. उच्च न्यायालय में लंबित है (सूची के नोट अनुसार) — इसलिए शामिल नहीं।</div>
+  <div class="step">🟢 आपकी स्थिति: <strong>श्री टीकूराम रावटे</strong>, निज सचिव क्र. 19 (संवर्ग नियुक्ति 03-02-2025) — Promotion Chain tab में SO पदोन्नति projection देखें।</div>`;
+}
+
+/* ============ RETIREMENT TIMELINE ============ */
+function renderTimeline(){
+ RA = parseInt(document.getElementById("raInput").value)||62;
+ document.getElementById("raLabel").textContent = RA;
+ const cf = document.getElementById("raCadre").value;
+ const till = parseInt(document.getElementById("raTill").value);
+ const now = new Date(2026,3,1);
+ let list = withRet(OFF).filter(o=>!cf||o.c===cf)
+   .map(o=>({...o, rd:new Date(o.ret.y,o.ret.m-1,o.ret.d)}))
+   .filter(o=>o.rd>=now && o.ret.y<=till)
+   .sort((a,b)=>a.rd-b.rd);
+ const byYear = {};
+ list.forEach(o=>{ (byYear[o.ret.y]=byYear[o.ret.y]||[]).push(o); });
+ const out = document.getElementById("tlOut");
+ if(!list.length){ out.innerHTML = `<div class="empty">चयनित अवधि/संवर्ग में कोई retirement नहीं।</div>`; return; }
+ out.innerHTML = Object.keys(byYear).sort().map(y=>`
+  <div class="yeargrp"><h3>वर्ष ${y} <span class="cnt">${byYear[y].length} retirement</span></h3>
+   ${byYear[y].map(o=>`<div class="tl-item ${o.me?'me':''}">
+     <span class="tl-date">${fmtR(o.ret)}</span>
+     <span class="tl-name">${o.nm}${o.me?' ⭐':''}</span>
+     <span class="badge b-blue">${CN[o.c]}</span>
+     <span class="tl-meta">जन्मतिथि ${fmtDMY(o.dob)} · ${o.p}${parseDMY(o.dob,true).d===1?' · <em>(1 तारीख जन्म → पूर्व माह अंत में retire)</em>':''}</span>
+    </div>`).join("")}
+  </div>`).join("");
+}
+
+/* ============ PSO PROJECTION ============ */
+function renderPSO(){
+ const posts = parseInt(document.getElementById("psoPosts").value)||3;
+ const yr = parseInt(document.getElementById("psoYear").value)||2029;
+ RA = parseInt(document.getElementById("raInput").value)||62;
+
+ /* पदोन्नति जोड़े: [स्रोत संवर्ग, लक्ष्य संवर्ग] — वरिष्ठता = पदक्रम सूची क्रमांक */
+ const PAIRS = [["SSO","PSO"],["SO","SSO"],["NS","SO"],["NSA","NS"],["SL","NSA"],["ST","SL"]];
+ let html = ``;
+
+ PAIRS.forEach(([src,tgt])=>{
+  const list = withRet(OFF.filter(o=>o.c===src)).sort((a,b)=>a.n-b.n); // पदक्रम सूची क्रम
+  const eligible = list.filter(o=> new Date(o.ret.y,o.ret.m-1,o.ret.d) > new Date(yr,0,1) && eligByYear(o,tgt,yr));
+  const selected = (tgt==="PSO") ? eligible.slice(0, posts) : [];
+  html += `<h3 style="margin:18px 0 8px;color:var(--green-dk)">${CN[src]} <span class="arrow">→</span> ${CN[tgt]}
+    <span class="badge b-blue">अर्हता: ${REQ[tgt]} वर्ष</span>
+    <span class="badge b-green">पात्र: ${eligible.length}/${list.length}</span></h3>
+   <div class="tblwrap"><table><thead><tr><th>वरिष्ठता क्र.</th><th>नाम</th><th>संवर्ग नियुक्ति</th><th>${REQ[tgt]} वर्ष अर्हता पूर्ण</th><th>Retirement</th><th>${yr} में स्थिति</th></tr></thead><tbody>
+   ${list.map(o=>{
+     const rd = new Date(o.ret.y,o.ret.m-1,o.ret.d);
+     const inSvc = rd > new Date(yr,0,1);
+     const elig = eligByYear(o,tgt,yr);
+     let st;
+     if (o.np) st = '<span class="badge b-red">promotion से बाहर</span>';
+     else if (!inSvc) st = '<span class="badge b-red">'+yr+' से पूर्व retire</span>';
+     else if (selected.includes(o)) st = '<span class="badge b-green">✔ PSO पदोन्नति संभावित</span>';
+     else if (elig) st = '<span class="badge b-green">पात्र</span>';
+     else st = '<span class="badge b-saf">'+REQ[tgt]+' वर्ष सेवा अपूर्ण</span>';
+     return `<tr class="${o.me?'me':''}"><td>${o.n}</td><td><strong>${o.nm}</strong>${o.me?' ⭐':''}</td>
+      <td>${fmtDMY(o.cd)}</td><td>${o.np?'—':eligDateStr(o,tgt)}</td><td>${fmtR(o.ret)}</td><td>${st}</td></tr>`;
+   }).join("")}
+   </tbody></table></div>`;
+ });
+ html += `<p style="font-size:.82rem;color:var(--muted);margin-top:10px">नोट: वरिष्ठता पदक्रम सूची (01.04.2026) के क्रमांक अनुसार। "पात्र" का अर्थ है निर्धारित सेवा अवधि पूर्ण — वास्तविक पदोन्नति रिक्त पदों की उपलब्धता (Promotion Chain tab), DPC एवं roster पर निर्भर करेगी।</p>`;
+ document.getElementById("psoOut").innerHTML = html;
+}
+
+/* ============ PROMOTION CHAIN ============ */
+function renderChain(){
+ RA = parseInt(document.getElementById("raInput").value)||62;
+ const till = parseInt(document.getElementById("chTill").value);
+ const psoPosts = parseInt(document.getElementById("psoPosts").value)||3;
+ const psoYear = parseInt(document.getElementById("psoYear").value)||2029;
+
+ // संवर्ग-वार working pool, वरिष्ठता = पदक्रम सूची क्रमांक
+ const pool = {};
+ ORDER.forEach(k=>{ pool[k] = withRet(OFF.filter(o=>o.c===k)).sort((a,b)=>a.n-b.n); });
+
+ // रिक्तियाँ अब "कारण" सहित रखी जाती हैं
+ const vac = {};
+ CADRES.forEach(c=>{
+   vac[c.key] = [];
+   for(let i=0; i<c.sanctioned-c.filled; i++) vac[c.key].push("मौजूदा रिक्त पद (01.04.2026 की स्थिति)");
+ });
+ vac["PSO"] = []; // PSO पद psoYear में खुलेंगे
+
+ const outEl = document.getElementById("chainOut");
+ let out = "";
+
+ for(let y=2026; y<=till; y++){
+  let events = [];
+  // PSO पद इस वर्ष खुलते हैं
+  if (y === psoYear){
+    for(let i=0;i<psoPosts;i++) vac["PSO"].push("PSO का रिक्त पद");
+    events.push(`<div class="step">🎯 <strong>PSO के ${psoPosts} पद</strong> इस वर्ष SSO से पदोन्नति द्वारा भरे जाने का projection।</div>`);
+  }
+  // इस वर्ष के retirements → कारण सहित रिक्ति
+  ORDER.forEach(k=>{
+    const retiring = pool[k].filter(o=>o.ret.y===y && (y>2026 || o.ret.m>=4));
+    retiring.forEach(o=>{
+      events.push(`<div class="step">👋 <strong>${o.nm}</strong> (${CN[k]}) — ${fmtR(o.ret)} को retire → <span class="badge b-saf">${CN[k]} में 1 पद रिक्त</span></div>`);
+      vac[k].push(`${o.nm} के retirement`);
+      pool[k] = pool[k].filter(x=>x!==o);
+    });
+  });
+  // ऊपर से नीचे cascade — हर promotion का "कारण" दिखाते हुए
+  for(let i=ORDER.length-1; i>=1; i--){
+    const up = ORDER[i], down = ORDER[i-1];
+    // सेवा से बाहर हो चुके officers हटाएँ (उनका पद रिक्त गिना जा चुका)
+    pool[down] = pool[down].filter(cand=> cand.ret.y >= y);
+    while(vac[up].length > 0){
+      const idx = pool[down].findIndex(cand => eligByYear(cand, up, y));
+      if (idx === -1){
+        if (pool[down].length > 0 || vac[up].length > 0)
+          events.push(`<div class="step" style="color:var(--muted)">⏸️ ${CN[up]} में ${vac[up].length} पद रिक्त — ${CN[down]} में अभी कोई पात्र officer नहीं (${REQ[up]} वर्ष सेवा अवधि अपूर्ण / promotion से बाहर) — रिक्ति अगले वर्ष carry होगी।</div>`);
+        break;
+      }
+      const cause = vac[up].shift(); // यह पद किस कारण रिक्त हुआ
+      const cand = pool[down].splice(idx,1)[0];
+      cand.cd = `31-12-${String(y).slice(2)}`; // नई अर्हता गणना हेतु
+      cand.c = up; pool[up].push(cand);
+      vac[down].push(`${cand.nm} की पदोन्नति`); // इनका पुराना पद अब रिक्त
+      events.push(`<div class="step">⬆️ <span class="badge b-saf">${cause} से रिक्त</span> ${CN[up]} पद पर — <strong>${cand.nm}</strong>${cand.me?' ⭐':''} (${CN[down]}, वरिष्ठता क्र. ${cand.n}) <span class="arrow">→</span> <strong>${CN[up]}</strong> promote</div>`);
+    }
+  }
+  if (events.length){
+    out += `<div class="chainyr"><h3>वर्ष ${y}</h3><div class="body">${events.join("")}</div></div>`;
+  } else {
+    out += `<div class="chainyr"><h3>वर्ष ${y}</h3><div class="body"><div class="step" style="color:var(--muted)">कोई retirement/promotion event projected नहीं।</div></div></div>`;
+  }
+ }
+ out += `<p style="font-size:.82rem;color:var(--muted)">⭐ = श्री टीकूराम रावटे। <strong>Promotion से बाहर:</strong> श्री जगदीश नारायण कोष्टा (निज सचिव), श्री भुवन डेकाटे एवं श्री धन्नूदास बुरडे (निज सहायक), श्री भुवन लाल मरसकोले (स्टेनो टाइपिस्ट) — ये अपने वर्तमान संवर्ग में ही रहेंगे (retirement तक); श्री पुरुषोत्तम कोष्टा का प्रकरण मान. उच्च न्यायालय में लंबित होने से सूची में शामिल नहीं। स्टेनो टाइपिस्ट → शीघ्रलेखक पदोन्नति में शीघ्रलेखक की 42 मौजूदा रिक्तियाँ भी शामिल हैं (परिवीक्षा/परीक्षा शर्तें लागू हो सकती हैं)। यह projection वरिष्ठता-आधारित indicative है — DPC, roster एवं पात्रता नियम final निर्णय करेंगे।</p>`;
+ outEl.innerHTML = out;
+}
+
+/* ============ SEARCH ============ */
+function renderSearch(){
+ const q = (document.getElementById("q").value||"").trim();
+ const cf = document.getElementById("fCadre").value, df = document.getElementById("fDist").value;
+ const tb = document.querySelector("#offTbl tbody");
+ const rows = withRet(OFF).filter(o=>
+   (!cf||o.c===cf) && (!df||o.d===df) &&
+   (!q || o.nm.includes(q) || o.p.includes(q))
+ );
+ tb.innerHTML = rows.length ? rows.map(o=>`<tr class="${o.me?'me':''}">
+   <td>${o.n}</td><td><strong>${o.nm}</strong>${o.me?' ⭐':''}${o.np?' <span class="badge b-red">promotion से बाहर</span>':''}</td>
+   <td><span class="badge b-blue">${CN[o.c]}</span></td>
+   <td>${fmtDMY(o.dob)}</td><td>${fmtDMY(o.cd)}</td><td>${o.d}</td>
+   <td><span class="badge ${o.ret.y<=2028?'b-red':(o.ret.y<=2032?'b-saf':'b-green')}">${fmtR(o.ret)}</span></td>
+   <td>${o.p}</td></tr>`).join("")
+  : `<tr><td colspan="8"><div class="empty">कोई officer नहीं मिला — खोज शब्द बदलकर देखें।</div></td></tr>`;
+}
+
+/* ============ PDF UPLOAD (pdf.js) ============ */
+const drop = document.getElementById("drop"), fileIn = document.getElementById("fileIn"), pdfout = document.getElementById("pdfout");
+drop.addEventListener("click",()=>fileIn.click());
+drop.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" ") fileIn.click(); });
+["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>{ if(e.dataTransfer.files[0]) handlePDF(e.dataTransfer.files[0]); });
+fileIn.addEventListener("change",()=>{ if(fileIn.files[0]) handlePDF(fileIn.files[0]); });
+
+let pdfjsReady = null;
+function loadPdfJs(){
+ if (pdfjsReady) return pdfjsReady;
+ pdfjsReady = new Promise((res,rej)=>{
+  const s = document.createElement("script");
+  s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+  s.onload = ()=>{ window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; res(); };
+  s.onerror = ()=>rej(new Error("pdf.js load नहीं हो सका — internet connection जाँचें।"));
+  document.head.appendChild(s);
+ });
+ return pdfjsReady;
+}
+async function handlePDF(file){
+ pdfout.style.display = "block";
+ pdfout.textContent = "⏳ PDF process हो रहा है...";
+ try{
+  await loadPdfJs();
+  const buf = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({data:buf}).promise;
+  let txt = `📄 ${file.name} — ${pdf.numPages} पृष्ठ\n\n`;
+  for(let p=1;p<=pdf.numPages;p++){
+   const page = await pdf.getPage(p);
+   const tc = await page.getTextContent();
+   txt += `───── पृष्ठ ${p} ─────\n` + tc.items.map(i=>i.str).join(" ") + "\n\n";
+  }
+  pdfout.textContent = txt;
+ }catch(err){
+  pdfout.textContent = "❌ त्रुटि: " + err.message + "\n(Scanned PDF से text नहीं निकलता — text-based PDF उपयोग करें।)";
+ }
+}
+
+/* ============ INIT ============ */
+(function init(){
+ // cadre dropdowns
+ const opts = CADRES.filter(c=>c.filled>0).map(c=>`<option value="${c.key}">${c.name}</option>`).join("");
+ document.getElementById("raCadre").innerHTML += opts;
+ document.getElementById("fCadre").innerHTML += opts;
+ const dists = [...new Set(OFF.map(o=>o.d))].sort((a,b)=>a.localeCompare(b,'hi'));
+ document.getElementById("fDist").innerHTML += dists.map(d=>`<option>${d}</option>`).join("");
+
+ document.getElementById("raGo").addEventListener("click",()=>{renderTimeline();});
+ document.getElementById("psoGo").addEventListener("click",()=>{renderPSO();});
+ document.getElementById("chGo").addEventListener("click",()=>{renderChain();});
+ ["q","fCadre","fDist"].forEach(id=>document.getElementById(id).addEventListener("input",renderSearch));
+
+ renderOverview(); renderTimeline(); renderPSO(); renderChain(); renderSearch();
+})();
+</script>
+</body>
+</html>
