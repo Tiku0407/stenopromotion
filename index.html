@@ -557,20 +557,20 @@ function renderPSO(){
  let html = ``;
 
  PAIRS.forEach(([src,tgt])=>{
-  const list = withRet(OFF.filter(o=>o.c===src)).sort((a,b)=>a.n-b.n); // पदक्रम सूची क्रम
-  const eligible = list.filter(o=> new Date(o.ret.y,o.ret.m-1,o.ret.d) > new Date(yr,0,1) && eligByYear(o,tgt,yr));
+  const all = withRet(OFF.filter(o=>o.c===src)).sort((a,b)=>a.n-b.n); // पदक्रम सूची क्रम
+  /* मूल्यांकन वर्ष के प्रारंभ तक जो सेवानिवृत्त हो चुके होंगे, वे सूची में नहीं आएँगे */
+  const list = all.filter(o=> new Date(o.ret.y,o.ret.m-1,o.ret.d) > new Date(yr,0,1));
+  const gone = all.length - list.length;
+  const eligible = list.filter(o=> eligByYear(o,tgt,yr));
   const selected = (tgt==="PSO") ? eligible.slice(0, posts) : [];
   html += `<h3 style="margin:18px 0 8px;color:var(--green-dk)">${CN[src]} <span class="arrow">→</span> ${CN[tgt]}
     <span class="badge b-blue">अर्हता: ${REQ[tgt]} वर्ष</span>
-    <span class="badge b-green">पात्र: ${eligible.length}/${list.length}</span></h3>
+    <span class="badge b-green">पात्र: ${eligible.length}/${list.length}</span>${gone?`<span class="badge b-saf">${gone} अधिकारी ${yr} से पूर्व सेवानिवृत्त — सूची से बाहर</span>`:""}</h3>
    <div class="tblwrap"><table><thead><tr><th>वरिष्ठता क्र.</th><th>नाम</th><th>संवर्ग नियुक्ति</th><th>${REQ[tgt]} वर्ष अर्हता पूर्ण</th><th>Retirement</th><th>${yr} में स्थिति</th></tr></thead><tbody>
    ${list.map(o=>{
-     const rd = new Date(o.ret.y,o.ret.m-1,o.ret.d);
-     const inSvc = rd > new Date(yr,0,1);
      const elig = eligByYear(o,tgt,yr);
      let st;
      if (o.np) st = '<span class="badge b-red">promotion से बाहर</span>';
-     else if (!inSvc) st = '<span class="badge b-red">'+yr+' से पूर्व retire</span>';
      else if (selected.includes(o)) st = '<span class="badge b-green">✔ PSO पदोन्नति संभावित</span>';
      else if (elig) st = '<span class="badge b-green">पात्र</span>';
      else st = '<span class="badge b-saf">'+REQ[tgt]+' वर्ष सेवा अपूर्ण</span>';
@@ -579,7 +579,7 @@ function renderPSO(){
    }).join("")}
    </tbody></table></div>`;
  });
- html += `<p style="font-size:.82rem;color:var(--muted);margin-top:10px">नोट: वरिष्ठता पदक्रम सूची (01.04.2026) के क्रमांक अनुसार। "पात्र" का अर्थ है निर्धारित सेवा अवधि पूर्ण — वास्तविक पदोन्नति रिक्त पदों की उपलब्धता (Promotion Chain tab), DPC एवं roster पर निर्भर करेगी।</p>`;
+ html += `<p style="font-size:.82rem;color:var(--muted);margin-top:10px">नोट: वरिष्ठता पदक्रम सूची (01.04.2026) के क्रमांक अनुसार। मूल्यांकन वर्ष की 01 जनवरी तक जो अधिकारी सेवानिवृत्त हो चुके होंगे, उनके नाम सूची में नहीं दिखाए जाते। "पात्र" का अर्थ है निर्धारित सेवा अवधि पूर्ण — वास्तविक पदोन्नति रिक्त पदों की उपलब्धता (Promotion Chain tab), DPC एवं roster पर निर्भर करेगी।</p>`;
  document.getElementById("psoOut").innerHTML = html;
 }
 
