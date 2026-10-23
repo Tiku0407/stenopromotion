@@ -223,7 +223,7 @@ footer{max-width:1150px;margin:0 auto;padding:14px 16px;font-size:.78rem;color:v
   </div>
   <div class="controls">
    <div><label for="chTill">Projection अवधि</label><select id="chTill">
-    <option value="2026-2030" selected>2026–2030</option><option value="2030-2035">2030–2035</option><option value="2035-2040">2035–2040</option><option value="2040-2045">2040–2045</option></select></div>
+    <option value="2026-2030" selected>2026–2030</option><option value="2030-2035">2030–2035</option><option value="2035-2040">2035–2040</option><option value="2040-2045">2040–2045</option><option value="2045-2050">2045–2050</option><option value="2050-2055">2050–2055</option><option value="2055-2060">2055–2060</option><option value="2060-2065">2060–2065</option><option value="2065-2080">2065–2080</option><option value="2026-2080">2026–2080 (पूरी अवधि)</option></select></div>
    <div><label for="chQ">नाम से खोजें — हिंदी/English (वैकल्पिक)</label><input type="text" id="chQ" placeholder="हिंदी या English — जैसे: रावटे, rawate, ekka, uike"></div>
    <button class="btn" id="chGo">Projection चलाएँ</button>
    <button class="btn" id="chClear" style="background:var(--muted)">खोज हटाएँ</button>
@@ -686,8 +686,9 @@ function simulateChain(till, psoPosts, psoYear, data){
     while(vac[up].length > 0){
       const idx = pool[down].findIndex(cand => eligByYear(cand, up, y));
       if (idx === -1){
-        if (pool[down].length > 0 || vac[up].length > 0)
-          ev.push({t:"hold", y, up, down, n:vac[up].length});
+        /* नीचे कोई officer ही न बचा हो तो सूचना अर्थहीन — केवल तब दिखाएँ
+           जब officer मौजूद हैं पर सेवा अवधि अपूर्ण है */
+        if (pool[down].length > 0) ev.push({t:"hold", y, up, down, n:vac[up].length});
         break;
       }
       const cause = vac[up].shift();
@@ -747,8 +748,8 @@ function getSim(){
   const psoYear  = parseInt(document.getElementById("psoYear").value)||2029;
   const key = `${RA}|${psoPosts}|${psoYear}`;
   if (_simKey !== key || !_simCache){
-    _simCache = simulateChain(2055, psoPosts, psoYear);
-    _simOld   = simulateChain(2055, oldPsoPosts(psoPosts), psoYear, oldSetupData());
+    _simCache = simulateChain(2080, psoPosts, psoYear);
+    _simOld   = simulateChain(2080, oldPsoPosts(psoPosts), psoYear, oldSetupData());
     _simKey   = key;
   }
   return {nw:_simCache, old:_simOld};
