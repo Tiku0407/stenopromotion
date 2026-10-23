@@ -815,7 +815,6 @@ function renderChain(){
  if (q && qFound && !out) out = `<div class="note">इस अवधि (${from}–${till}) में "<strong>${q}</strong>" से जुड़ा कोई event नहीं — दूसरी Projection अवधि चुनकर देखें।</div>`;
  out = card + out;
  out = `<p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">${q?`🔍 खोज: <strong>${q}</strong> · `:""}⚙️ <strong>${SETUP==="old"?"पुराना setup (नवीन पद बिना)":"नया setup (नवीन 07 पद सहित)"}</strong> · 📅 प्रदर्शित अवधि: <strong>${from}–${till}</strong> (promotion क्रम की गणना 2026 से निरंतर की गई है — ${from>2026?'पूर्व वर्षों की पदोन्नतियाँ लागू मानकर':'प्रारंभ से'})</p>` + out;
- out += `<p style="font-size:.82rem;color:var(--muted)">⭐ = श्री टीकूराम रावटे। <strong>Promotion से बाहर:</strong> श्री जगदीश नारायण कोष्टा (निज सचिव), श्री भुवन डेकाटे एवं श्री धन्नूदास बुरडे (निज सहायक), श्री भुवन लाल मरसकोले (स्टेनो टाइपिस्ट) — ये अपने वर्तमान संवर्ग में ही रहेंगे (retirement तक); श्री पुरुषोत्तम कोष्टा का प्रकरण मान. उच्च न्यायालय में लंबित होने से सूची में शामिल नहीं। स्टेनो टाइपिस्ट → शीघ्रलेखक पदोन्नति में शीघ्रलेखक की 42 मौजूदा रिक्तियाँ भी शामिल हैं (परिवीक्षा/परीक्षा शर्तें लागू हो सकती हैं)। यह projection वरिष्ठता-आधारित indicative है — DPC, roster एवं पात्रता नियम final निर्णय करेंगे।</p>`;
  document.getElementById("chainOut").innerHTML = out;
  renderSearch(); // search की अगली-पदोन्नति भी ताज़ा रखें
 }
