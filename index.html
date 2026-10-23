@@ -91,6 +91,15 @@ button.btn:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
 .step{padding:7px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
 .step:last-child{border-bottom:none}
 .arrow{color:var(--saffron);font-weight:700}
+.setupbar{background:var(--green-lt);border-bottom:1px solid var(--line);padding:9px 20px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:.9rem}
+.setupbar strong{color:var(--green-dk)}
+.setupbar .opt{display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:5px 13px}
+.setupbar .opt.on{border-color:var(--green);background:#dff0e6;font-weight:700;color:var(--green-dk)}
+.setupbar .hint{color:var(--muted);font-size:.84rem}
+body.oldsetup .setupbar{background:#fdf0e0}
+body.oldsetup .setupbar .opt.on{border-color:var(--saffron);background:#fbe3c6;color:#8a4a00}
 /* पदोन्नति वर्ष — निकट/मध्यम/दूर के अनुसार रंग */
 .yr{display:inline-block;font-weight:800;font-size:1.02rem;letter-spacing:.3px;
     padding:1px 9px;border-radius:999px;border:1.5px solid currentColor;line-height:1.45}
@@ -131,6 +140,13 @@ footer{max-width:1150px;margin:0 auto;padding:14px 16px;font-size:.78rem;color:v
  <button class="tab" data-t="search">🔍 Officer खोजें</button>
  <button class="tab" data-t="upload">📄 नया PDF Upload</button>
 </div></nav>
+
+<div class="setupbar">
+ <strong>पद स्थिति:</strong>
+ <label class="opt on" id="optNew"><input type="radio" name="setup" value="new" checked> नया setup — नवीन 07 पद सहित <span class="badge b-green">4 · 8 · 14 · 32</span></label>
+ <label class="opt" id="optOld"><input type="radio" name="setup" value="old"> पुराना setup — नवीन पद बिना <span class="badge b-saf">3 · 6 · 12 · 30</span></label>
+ <span class="hint" id="setupHint">क्रम: प्रधान स्टॉफ ऑफिसर · वरिष्ठ स्टॉफ ऑफिसर · स्टॉफ ऑफिसर · निज सचिव</span>
+</div>
 
 <main>
 
@@ -465,7 +481,8 @@ document.querySelectorAll(".tab").forEach(b=>{
 
 /* ============ OVERVIEW ============ */
 function renderOverview(){
- const totS = CADRES.reduce((a,c)=>a+c.sanctioned,0), totF = CADRES.reduce((a,c)=>a+c.filled,0);
+ const CC = CAD();
+ const totS = CC.reduce((a,c)=>a+c.sanctioned,0), totF = CC.reduce((a,c)=>a+c.filled,0);
  const now = new Date(2026,3,1);
  const soon = withRet(OFF).filter(o=>{ const rd=new Date(o.ret.y,o.ret.m-1,o.ret.d); return rd>=now && o.ret.y<=2029; }).length;
  document.getElementById("kpirow").innerHTML = `
@@ -475,7 +492,7 @@ function renderOverview(){
   <div class="kpi alert"><div class="n">${soon}</div><div class="l">Retirement (2026–2029)</div></div>`;
 
  const tb = document.querySelector("#cadreTbl tbody");
- tb.innerHTML = CADRES.map(c=>{
+ tb.innerHTML = CC.map(c=>{
   const pct = c.sanctioned ? Math.round(100*c.filled/c.sanctioned) : 0;
   const vac = c.sanctioned - c.filled;
   return `<tr><td><strong>${c.name}</strong>${c.key==="PSO"?' <span class="badge b-red">सभी रिक्त</span>':''}${c.newP?` <span class="badge b-green">+${c.newP} नवीन पद</span>`:''}</td>
@@ -531,7 +548,7 @@ function renderTimeline(){
 
 /* ============ PSO PROJECTION ============ */
 function renderPSO(){
- const posts = parseInt(document.getElementById("psoPosts").value)||4;
+ const posts = PSOP(parseInt(document.getElementById("psoPosts").value)||4);
  const yr = parseInt(document.getElementById("psoYear").value)||2029;
  RA = parseInt(document.getElementById("raInput").value)||62;
 
@@ -716,6 +733,13 @@ function oldSetupData(){
 }
 const oldPsoPosts = p => Math.max(0, p - ((CADRES.find(c=>c.key==="PSO")||{}).newP||0));
 
+/* ===== कौन-सा setup सक्रिय है — पूरे dashboard पर लागू ===== */
+let SETUP = "new";
+let _oldCad = null;
+const CAD = () => SETUP === "old" ? (_oldCad = _oldCad || oldSetupData().CADRES) : CADRES;
+const DATASET = () => SETUP === "old" ? {OFF:OFF, CADRES:CAD()} : null;
+const PSOP = p => SETUP === "old" ? oldPsoPosts(p) : p;
+
 /* ---- search हेतु cache (RA/PSO settings बदलने पर दोबारा गणना) ---- */
 let _simCache = null, _simOld = null, _simKey = "";
 function getSim(){
@@ -739,7 +763,7 @@ function renderChain(){
  const psoYear = parseInt(document.getElementById("psoYear").value)||2029;
 
  const q = (document.getElementById("chQ").value||"").trim();
- const {ev} = simulateChain(till, psoPosts, psoYear);
+ const {ev} = simulateChain(till, PSOP(psoPosts), psoYear, DATASET());
 
  /* नाम दिया हो तो केवल उसी officer से जुड़े events — उनकी अपनी पदोन्नतियाँ,
     उनकी सेवानिवृत्ति, तथा वे पदोन्नतियाँ जो उनके हटने/बढ़ने से संभव हुईं */
@@ -789,7 +813,7 @@ function renderChain(){
  }
  if (q && qFound && !out) out = `<div class="note">इस अवधि (${from}–${till}) में "<strong>${q}</strong>" से जुड़ा कोई event नहीं — दूसरी Projection अवधि चुनकर देखें।</div>`;
  out = card + out;
- out = `<p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">${q?`🔍 खोज: <strong>${q}</strong> · `:""}📅 प्रदर्शित अवधि: <strong>${from}–${till}</strong> (promotion क्रम की गणना 2026 से निरंतर की गई है — ${from>2026?'पूर्व वर्षों की पदोन्नतियाँ लागू मानकर':'प्रारंभ से'})</p>` + out;
+ out = `<p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">${q?`🔍 खोज: <strong>${q}</strong> · `:""}⚙️ <strong>${SETUP==="old"?"पुराना setup (नवीन पद बिना)":"नया setup (नवीन 07 पद सहित)"}</strong> · 📅 प्रदर्शित अवधि: <strong>${from}–${till}</strong> (promotion क्रम की गणना 2026 से निरंतर की गई है — ${from>2026?'पूर्व वर्षों की पदोन्नतियाँ लागू मानकर':'प्रारंभ से'})</p>` + out;
  out += `<p style="font-size:.82rem;color:var(--muted)">⭐ = श्री टीकूराम रावटे। <strong>Promotion से बाहर:</strong> श्री जगदीश नारायण कोष्टा (निज सचिव), श्री भुवन डेकाटे एवं श्री धन्नूदास बुरडे (निज सहायक), श्री भुवन लाल मरसकोले (स्टेनो टाइपिस्ट) — ये अपने वर्तमान संवर्ग में ही रहेंगे (retirement तक); श्री पुरुषोत्तम कोष्टा का प्रकरण मान. उच्च न्यायालय में लंबित होने से सूची में शामिल नहीं। स्टेनो टाइपिस्ट → शीघ्रलेखक पदोन्नति में शीघ्रलेखक की 42 मौजूदा रिक्तियाँ भी शामिल हैं (परिवीक्षा/परीक्षा शर्तें लागू हो सकती हैं)। यह projection वरिष्ठता-आधारित indicative है — DPC, roster एवं पात्रता नियम final निर्णय करेंगे।</p>`;
  document.getElementById("chainOut").innerHTML = out;
  renderSearch(); // search की अगली-पदोन्नति भी ताज़ा रखें
@@ -894,6 +918,16 @@ async function handlePDF(file){
 
  document.getElementById("raGo").addEventListener("click",()=>{renderTimeline();});
  document.getElementById("psoGo").addEventListener("click",()=>{renderPSO();});
+ document.querySelectorAll('input[name="setup"]').forEach(r=>{
+   r.addEventListener("change",()=>{
+     SETUP = r.value;
+     document.body.classList.toggle("oldsetup", SETUP==="old");
+     document.getElementById("optNew").classList.toggle("on", SETUP==="new");
+     document.getElementById("optOld").classList.toggle("on", SETUP==="old");
+     _simKey = "";                       // दोनों सिमुलेशन दोबारा
+     renderOverview(); renderTimeline(); renderPSO(); renderChain();
+   });
+ });
  document.getElementById("chGo").addEventListener("click",()=>{renderChain();});
  document.getElementById("chQ").addEventListener("input",()=>{renderChain();});
  document.getElementById("chQ").addEventListener("keydown",e=>{ if(e.key==="Enter") renderChain(); });
