@@ -91,6 +91,14 @@ button.btn:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
 .step{padding:7px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
 .step:last-child{border-bottom:none}
 .arrow{color:var(--saffron);font-weight:700}
+/* पदोन्नति वर्ष — निकट/मध्यम/दूर के अनुसार रंग */
+.yr{display:inline-block;font-weight:800;font-size:1.02rem;letter-spacing:.3px;
+    padding:1px 9px;border-radius:999px;border:1.5px solid currentColor;line-height:1.45}
+.yr.near{color:#0f6b3a;background:#e4f5ea}
+.yr.mid {color:#b35c00;background:#fdf0e0}
+.yr.far {color:#2b4f81;background:#e8eef7}
+.yr.vfar{color:#6b4c9a;background:#f0eaf8}
+.chainyr>h3 .yr{font-size:1.08rem;vertical-align:1px}
 
 /* Upload */
 .drop{border:2px dashed var(--green);border-radius:var(--radius);background:var(--green-lt);padding:34px;text-align:center;cursor:pointer;transition:background .2s}
@@ -170,10 +178,10 @@ footer{max-width:1150px;margin:0 auto;padding:14px 16px;font-size:.78rem;color:v
   <h2>पद पूर्ति Projection — सभी संवर्ग</h2>
   <div class="note">प्रत्येक संवर्ग की <strong>पदक्रम सूची (वरिष्ठता क्रमांक)</strong> के अनुसार अगले संवर्ग में पदोन्नति की पात्रता स्थिति।
    <strong>निर्धारित अर्हता:</strong> SSO → PSO व SO → SSO हेतु 03 वर्ष; निज सचिव → SO, निज सहायक → निज सचिव, शीघ्रलेखक → निज सहायक, स्टेनो टाइपिस्ट → शीघ्रलेखक हेतु 05 वर्ष सेवा अवधि।
-   PSO (Level 15, 37400–67000 + GP 8700) के 03 स्वीकृत पद हैं — SSO seniority से भरे जाएँगे।</div>
+   PSO (Level 15, 37400–67000 + GP 8700) के <strong>04 स्वीकृत पद</strong> (03 पूर्व + 01 नवीन सृजित) हैं — SSO seniority से भरे जाएँगे।</div>
   <div class="controls">
    <div><label for="psoYear">मूल्यांकन वर्ष</label><input type="number" id="psoYear" value="2029" min="2026" max="2045"></div>
-   <div><label for="psoPosts">PSO स्वीकृत पद</label><input type="number" id="psoPosts" value="3" min="1" max="6"></div>
+   <div><label for="psoPosts">PSO स्वीकृत पद</label><input type="number" id="psoPosts" value="4" min="1" max="8"></div>
    <button class="btn" id="psoGo">Projection देखें</button>
   </div>
   <div id="psoOut"></div>
@@ -199,8 +207,10 @@ footer{max-width:1150px;margin:0 auto;padding:14px 16px;font-size:.78rem;color:v
   </div>
   <div class="controls">
    <div><label for="chTill">Projection अवधि</label><select id="chTill">
-    <option value="2030">2026–2030</option><option value="2035" selected>2026–2035</option><option value="2040">2026–2040</option><option value="2045">2026–2045</option></select></div>
+    <option value="2026-2030" selected>2026–2030</option><option value="2030-2035">2030–2035</option><option value="2035-2040">2035–2040</option><option value="2040-2045">2040–2045</option></select></div>
+   <div><label for="chQ">नाम से खोजें — हिंदी/English (वैकल्पिक)</label><input type="text" id="chQ" placeholder="हिंदी या English — जैसे: रावटे, rawate, ekka, uike"></div>
    <button class="btn" id="chGo">Projection चलाएँ</button>
+   <button class="btn" id="chClear" style="background:var(--muted)">खोज हटाएँ</button>
   </div>
   <div id="chainOut"></div>
  </div>
@@ -211,12 +221,13 @@ footer{max-width:1150px;margin:0 auto;padding:14px 16px;font-size:.78rem;color:v
  <div class="card">
   <h2>Officer खोजें एवं Filter करें</h2>
   <div class="controls">
-   <div><label for="q">नाम / पदस्थापना</label><input type="text" id="q" placeholder="जैसे: रावटे, गृह, वित्त..."></div>
+   <div><label for="q">नाम (हिंदी/English) / पदस्थापना / कारण</label><input type="text" id="q" placeholder="हिंदी या English — जैसे: rawate, panka, गृह, उईके"></div>
+   <div><label for="fPromo">अगली पदोन्नति</label><select id="fPromo"><option value="">सभी</option><option value="ret">सेवानिवृत्ति से रिक्त पद पर</option><option value="promo">पदोन्नति से रिक्त पद पर</option><option value="new">नवीन सृजित पद पर</option><option value="none">कोई पदोन्नति नहीं</option></select></div>
    <div><label for="fCadre">संवर्ग</label><select id="fCadre"><option value="">सभी</option></select></div>
    <div><label for="fDist">गृह जिला</label><select id="fDist"><option value="">सभी</option></select></div>
   </div>
   <div class="tblwrap"><table id="offTbl">
-   <thead><tr><th>क्र.</th><th>नाम</th><th>संवर्ग</th><th>जन्मतिथि</th><th>संवर्ग नियुक्ति</th><th>गृह जिला</th><th>Retirement</th><th>वर्तमान पदस्थापना</th></tr></thead>
+   <thead><tr><th>क्र.</th><th>नाम</th><th>संवर्ग</th><th>अगली पदोन्नति<br><small>नया setup (नवीन 07 पद सहित)</small></th><th>अगली पदोन्नति<br><small>पुराना setup (नवीन पद बिना)</small></th><th>अंतर</th><th>किस कारण रिक्त पद पर<br><small>(नया setup)</small></th><th>जन्मतिथि</th><th>संवर्ग नियुक्ति</th><th>गृह जिला</th><th>Retirement</th><th>वर्तमान पदस्थापना</th></tr></thead>
    <tbody></tbody>
   </table></div>
  </div>
@@ -243,10 +254,10 @@ footer{max-width:1150px;margin:0 auto;padding:14px 16px;font-size:.78rem;color:v
 /* ============ DATA (PDF दिनांक 01.04.2026 से extract) ============ */
 /* dob: DD-MM-YY | cd: संवर्ग में नियुक्ति दिनांक | post: वर्तमान पदस्थापना */
 const CADRES = [
- {key:"PSO", name:"प्रधान स्टॉफ ऑफिसर", level:"15 (37400–67000 + GP 8700)", sanctioned:3, filled:0},
- {key:"SSO", name:"वरिष्ठ स्टॉफ ऑफिसर", level:"14 (15600–39100 + GP 7600)", sanctioned:6, filled:6},
- {key:"SO",  name:"स्टॉफ ऑफिसर", level:"13 (15600–39100 + GP 6600)", sanctioned:12, filled:12},
- {key:"NS",  name:"निज सचिव", level:"11 (9300–34800 + GP 4800)", sanctioned:30, filled:28},
+ {key:"PSO", name:"प्रधान स्टॉफ ऑफिसर", level:"15 (37400–67000 + GP 8700)", sanctioned:4, filled:0, newP:1},
+ {key:"SSO", name:"वरिष्ठ स्टॉफ ऑफिसर", level:"14 (15600–39100 + GP 7600)", sanctioned:8, filled:6, newP:2},
+ {key:"SO",  name:"स्टॉफ ऑफिसर", level:"13 (15600–39100 + GP 6600)", sanctioned:14, filled:12, newP:2},
+ {key:"NS",  name:"निज सचिव", level:"11 (9300–34800 + GP 4800)", sanctioned:32, filled:26, newP:2},
  {key:"NSA", name:"निज सहायक", level:"09 (9300–34800 + GP 4300)", sanctioned:27, filled:22},
  {key:"SL",  name:"शीघ्रलेखक", level:"07 (5200–20200 + GP 2800)", sanctioned:54, filled:12},
  {key:"ST",  name:"स्टेनो टाइपिस्ट", level:"04 (5200–20200 + GP 1900)", sanctioned:62, filled:31},
@@ -259,12 +270,10 @@ const OFF = [
 {c:"SSO",n:4,nm:"श्री शैलेन्द्र कुमार बोरकर",dob:"20-09-77",cd:"29-01-26",d:"बालाघाट",j:"अ.जा.",p:"सचिव, नगरीय प्रशासन"},
 {c:"SSO",n:5,nm:"श्री हरीश उईके",dob:"13-10-68",cd:"29-01-26",d:"बस्तर",j:"अ.ज.जा.",p:"सचिव, जल संसाधन"},
 {c:"SSO",n:6,nm:"श्री संतोष कुमार पवार",dob:"25-12-70",cd:"03-03-26",d:"रायसेन",j:"सामान्य",p:"अपर मुख्य सचिव, पंचायत"},
-/* SO */
-{c:"SO",n:1,nm:"श्री राजेश कुमार हीरा",dob:"01-07-64",cd:"03-11-17",d:"जबलपुर",j:"सामान्य",p:"सचिव, गृह"},
+/* SO — क्र. 1 (श्री राजेश कुमार हीरा, retire 30-06-2026) एवं क्र. 5 (श्री कमल कुमार तिवारी, retire 31-07-2026) सेवानिवृत्त होने से सूची से हटाए गए */
 {c:"SO",n:2,nm:"श्रीमती अंजू सिंग",dob:"17-05-73",cd:"30-05-20",d:"रायगढ़",j:"अ.ज.जा.",p:"सचिव, ग्रामोद्योग"},
 {c:"SO",n:3,nm:"श्री दिलीप सिंह परते",dob:"12-02-67",cd:"30-05-20",d:"बालाघाट",j:"अ.ज.जा.",p:"विशेष सचिव, राजस्व"},
 {c:"SO",n:4,nm:"श्रीमती सुषमा तिग्गा",dob:"18-07-69",cd:"01-06-20",d:"रायगढ़",j:"अ.ज.जा.",p:"सचिव, मान. मुख्यमंत्री"},
-{c:"SO",n:5,nm:"श्री कमल कुमार तिवारी",dob:"07-07-64",cd:"01-06-20",d:"रायपुर",j:"सामान्य",p:"सचिव, पंचायत एवं ग्रामीण विकास"},
 {c:"SO",n:6,nm:"श्री रंजित लकड़ा",dob:"09-10-75",cd:"20-11-24",d:"सरगुजा",j:"अ.ज.जा.",p:"विशेष सचिव, वित्त विभाग"},
 {c:"SO",n:7,nm:"श्री बिजेश कुमार वर्मा",dob:"18-10-66",cd:"29-01-26",d:"रायपुर",j:"सामान्य",p:"सचिव, मान. मुख्यमंत्री"},
 {c:"SO",n:8,nm:"श्री मोहन दास साहू",dob:"04-01-71",cd:"29-01-26",d:"राजनांदगांव",j:"पि.वर्ग",p:"लोक भवन सचिवालय (प्रति.)"},
@@ -272,10 +281,13 @@ const OFF = [
 {c:"SO",n:10,nm:"श्रीमती सुभागनी क.एक्का",dob:"12-03-80",cd:"06-03-26",d:"जशपुर",j:"अ.ज.जा.",p:"संयुक्त सचिव, इले. एवं सूचना प्रौद्यो."},
 {c:"SO",n:11,nm:"श्री जग्गूराम नेताम",dob:"09-11-76",cd:"29-01-26",d:"धमतरी",j:"अ.ज.जा.",p:"संयुक्त सचिव, राजस्व"},
 {c:"SO",n:12,nm:"श्री सतीश कुमार ठाकुर",dob:"10-07-83",cd:"03-03-26",d:"दुर्ग",j:"अ.ज.जा.",p:"सचिव, खेल एवं युवा कल्याण"},
+/* क्र. 13-14 — निज सचिव से पदोन्नत होकर आए। श्री राजेश कुमार हीरा (30 जून 2026) एवं
+   श्री कमल कुमार तिवारी (31 जुलाई 2026) की सेवानिवृत्ति से रिक्त पदों पर, नियमानुसार अगले माह।
+   संवर्ग नियुक्ति दिनांक = पदोन्नति माह का अंतिम दिन (आदेश की वास्तविक तिथि मिलने पर बदली जा सकती है)। */
+{c:"SO",n:13,nm:"श्री सैयद जाकिर अली",dob:"16-09-75",cd:"31-07-26",d:"हरदा",j:"सामान्य",p:"सचिव, कृषि वि. एवं कि. कल्याण"},
+{c:"SO",n:14,nm:"श्री संजय कनाठे",dob:"28-07-69",cd:"31-08-26",d:"बैतूल",j:"पि.वर्ग",p:"सचिव, पर्यटन"},
 /* निज सचिव */
 {c:"NS",n:1,nm:"श्री जगदीश नारायण कोष्टा",dob:"28-06-74",cd:"14-09-11",d:"जबलपुर",j:"सामान्य",p:"सचिव, संसदीय कार्य",np:true},
-{c:"NS",n:2,nm:"श्री सैयद जाकिर अली",dob:"16-09-75",cd:"07-02-18",d:"हरदा",j:"सामान्य",p:"सचिव, कृषि वि. एवं कि. कल्याण"},
-{c:"NS",n:3,nm:"श्री संजय कनाठे",dob:"28-07-69",cd:"19-04-21",d:"बैतूल",j:"पि.वर्ग",p:"सचिव, पर्यटन"},
 {c:"NS",n:4,nm:"श्री नितिन रामेकर",dob:"10-07-72",cd:"10-05-21",d:"रायपुर",j:"पि.वर्ग",p:"प्रमुख सचिव, गृह"},
 {c:"NS",n:5,nm:"श्री राजेश ओझा",dob:"16-05-78",cd:"19-04-21",d:"रायपुर",j:"सामान्य",p:"सचिव, आवास एवं पर्यावरण"},
 {c:"NS",n:6,nm:"श्री ओम प्रकाश श्रीवास्तव",dob:"22-08-81",cd:"31-01-22",d:"रायपुर",j:"सामान्य",p:"सचिव, लोक निर्माण विभाग"},
@@ -397,6 +409,34 @@ const fmtDMY = s => { const p = parseDMY(s,true); return `${String(p.d).padStart
 const cdKey = s => { const p = parseDMY(s,false); return p.y*10000 + p.m*100 + p.d; };
 
 let RA = 62;
+
+/* ====== सेवानिवृत्त हो चुके officers को सूची से स्वतः बाहर करना ======
+   नियम: जिनकी जन्मतिथि से 62 वर्ष पूर्ण हो चुके हैं (अर्थात् सेवानिवृत्ति तिथि
+   आज की तारीख से पहले बीत चुकी है) वे पदक्रम सूची में नहीं रहेंगे।
+   सेवानिवृत्ति के दिन तक officer सेवा में माने जाते हैं।
+   सम्बंधित संवर्ग के "भरे पद" भी उतने ही कम कर दिए जाते हैं।           */
+const todayStr = () => { const t=new Date(); return `${String(t.getDate()).padStart(2,"0")} ${M[t.getMonth()]} ${t.getFullYear()}`; };
+function nextRetText(){
+  const t=new Date(); t.setHours(0,0,0,0);
+  const nx = OFF.map(o=>({o,r:retireDate(o.dob,RA)}))
+                .filter(x=> new Date(x.r.y,x.r.m-1,x.r.d) >= t)
+                .sort((a,b)=> new Date(a.r.y,a.r.m-1,a.r.d) - new Date(b.r.y,b.r.m-1,b.r.d))[0];
+  return nx ? `${nx.o.nm} (${CN[nx.o.c]}) — ${fmtR(nx.r)}` : "कोई नहीं";
+}
+const RETIRED_OUT = [];
+(function dropRetiredOfficers(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = OFF.length - 1; i >= 0; i--){
+    const o = OFF[i], r = retireDate(o.dob, 62);
+    if (new Date(r.y, r.m-1, r.d) < today){
+      RETIRED_OUT.push(Object.assign({}, o, {ret:r}));
+      OFF.splice(i,1);
+      const c = CADRES.find(c => c.key === o.c);
+      if (c && c.filled > 0) c.filled--;
+    }
+  }
+  RETIRED_OUT.sort((a,b)=> new Date(a.ret.y,a.ret.m-1,a.ret.d) - new Date(b.ret.y,b.ret.m-1,b.ret.d));
+})();
 function withRet(list){ return list.map(o => ({...o, ret: retireDate(o.dob, RA)})); }
 
 /* पदोन्नति हेतु निर्धारित सेवा अवधि (target संवर्ग के अनुसार, वर्तमान संवर्ग में) */
@@ -438,16 +478,21 @@ function renderOverview(){
  tb.innerHTML = CADRES.map(c=>{
   const pct = c.sanctioned ? Math.round(100*c.filled/c.sanctioned) : 0;
   const vac = c.sanctioned - c.filled;
-  return `<tr><td><strong>${c.name}</strong>${c.key==="PSO"?' <span class="badge b-red">सभी रिक्त</span>':''}</td>
+  return `<tr><td><strong>${c.name}</strong>${c.key==="PSO"?' <span class="badge b-red">सभी रिक्त</span>':''}${c.newP?` <span class="badge b-green">+${c.newP} नवीन पद</span>`:''}</td>
    <td>${c.level}</td><td>${c.sanctioned}</td><td>${c.filled}</td>
    <td>${vac>0?`<span class="badge b-saf">${vac}</span>`:'<span class="badge b-green">0</span>'}</td>
    <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${pct}%"></i></div><span style="font-size:.8rem">${pct}%</span></div></td></tr>`;
  }).join("");
 
  document.getElementById("insights").innerHTML = `
+  <div class="step">🆕 <strong>नवीन पद सृजन:</strong> प्रधान स्टॉफ ऑफिसर +01 (कुल 04), वरिष्ठ स्टॉफ ऑफिसर +02 (कुल 08), स्टॉफ ऑफिसर +02 (कुल 14), निज सचिव +02 (कुल 32) — कुल 07 नवीन पद — ये नवीन पद <strong>जनवरी 2027 से</strong> promotion हेतु उपलब्ध होंगे, अभी (2026 में) नहीं (chain में "नवीन सृजित पद (जनवरी 2027 से)" के रूप में चिह्नित)।</div>
   <div class="step">🔴 <strong>प्रधान स्टॉफ ऑफिसर</strong> संवर्ग पूर्णतः रिक्त — projection अनुसार <strong>2029</strong> में SSO से पदोन्नति द्वारा भरा जाएगा।</div>
   <div class="step">⚠️ <strong>शीघ्रलेखक</strong> में सर्वाधिक रिक्तियाँ (42/54) — निचले संवर्ग से पदोन्नति एवं सीधी भर्ती दोनों की गुंजाइश।</div>
-  <div class="step">⏳ <strong>2026 में ही</strong> स्टॉफ ऑफिसर संवर्ग के दो senior officer (श्री राजेश कुमार हीरा — 30 जून 2026, श्री कमल कुमार तिवारी — 31 जुलाई 2026) retire होंगे — SO में तत्काल रिक्तियाँ।</div>
+  <div class="step">⏳ स्टॉफ ऑफिसर संवर्ग के दो senior officer <strong>retire हो चुके हैं</strong> — श्री राजेश कुमार हीरा (30 जून 2026) एवं श्री कमल कुमार तिवारी (31 जुलाई 2026) — इनके नाम सूची से हटा दिए गए हैं।</div>
+  <div class="step">✅ <strong>हो चुकी पदोन्नतियाँ:</strong> इन दोनों रिक्त पदों पर नियमानुसार <em>अगले माह</em> पदोन्नति हो चुकी है — <strong>श्री सैयद जाकिर अली</strong> (निज सचिव क्र. 2) → स्टॉफ ऑफिसर, <strong>जुलाई 2026</strong>; एवं <strong>श्री संजय कनाठे</strong> (निज सचिव क्र. 3) → स्टॉफ ऑफिसर, <strong>अगस्त 2026</strong>। दोनों अब स्टॉफ ऑफिसर संवर्ग में क्र. 13 एवं 14 पर हैं — भरे पद 10 → <strong>12</strong> (अब कोई पुरानी रिक्ति नहीं, केवल 02 नवीन सृजित शेष)। निज सचिव में इनके 02 पद रिक्त हुए — भरे पद 28 → <strong>26</strong>, पुरानी रिक्तियाँ 02 → <strong>04</strong> (02 नवीन सृजित सहित तालिका में कुल 06)।</div>
+  ${RETIRED_OUT.length
+    ? `<div class="step">🚪 <strong>आज की तिथि (${todayStr()}) तक 62 वर्ष पूर्ण कर चुके ${RETIRED_OUT.length} officer सूची से स्वतः बाहर कर दिए गए</strong> — ${RETIRED_OUT.map(o=>`${o.nm} (${CN[o.c]}, ${fmtR(o.ret)})`).join("; ")} — इनके पद रिक्तियों में जोड़ दिए गए हैं।</div>`
+    : `<div class="step">✅ <strong>आज की तिथि (${todayStr()}) तक</strong> सूची में कोई ऐसा officer शेष नहीं जिसकी आयु 62 वर्ष पूर्ण हो चुकी हो — सूची अद्यतन है। अगली सेवानिवृत्ति: <strong>${nextRetText()}</strong>।</div>`}
   <div class="step">📌 <strong>Promotion से बाहर:</strong> श्री जगदीश नारायण कोष्टा (निज सचिव क्र. 1), श्री भुवन डेकाटे व श्री धन्नूदास बुरडे (निज सहायक क्र. 1–2), श्री भुवन लाल मरसकोले (स्टेनो टाइपिस्ट क्र. 1) — projection में इनकी पदोन्नति नहीं दिखाई जाती; इनके नीचे के officers seniority क्रम में आगे बढ़ते हैं। श्री पुरुषोत्तम कोष्टा का प्रकरण मान. उच्च न्यायालय में लंबित है (सूची के नोट अनुसार) — इसलिए शामिल नहीं।</div>
   <div class="step">🟢 आपकी स्थिति: <strong>श्री टीकूराम रावटे</strong>, निज सचिव क्र. 19 (संवर्ग नियुक्ति 03-02-2025) — Promotion Chain tab में SO पदोन्नति projection देखें।</div>`;
 }
@@ -462,14 +507,20 @@ function renderTimeline(){
  let list = withRet(OFF).filter(o=>!cf||o.c===cf)
    .map(o=>({...o, rd:new Date(o.ret.y,o.ret.m-1,o.ret.d)}))
    .filter(o=>o.rd>=now && o.ret.y<=till)
-   .sort((a,b)=>a.rd-b.rd);
- const byYear = {};
- list.forEach(o=>{ (byYear[o.ret.y]=byYear[o.ret.y]||[]).push(o); });
+   .sort((a,b)=>a.rd-b.rd); // सबसे पहले retire होने वाला सबसे ऊपर
+ // माह-वार grouping (क्रम से)
+ const groups = [];
+ list.forEach(o=>{
+   const key = o.ret.y*100 + o.ret.m;
+   let g = groups.length && groups[groups.length-1].key===key ? groups[groups.length-1] : null;
+   if(!g){ g = {key, y:o.ret.y, m:o.ret.m, items:[]}; groups.push(g); }
+   g.items.push(o);
+ });
  const out = document.getElementById("tlOut");
  if(!list.length){ out.innerHTML = `<div class="empty">चयनित अवधि/संवर्ग में कोई retirement नहीं।</div>`; return; }
- out.innerHTML = Object.keys(byYear).sort().map(y=>`
-  <div class="yeargrp"><h3>वर्ष ${y} <span class="cnt">${byYear[y].length} retirement</span></h3>
-   ${byYear[y].map(o=>`<div class="tl-item ${o.me?'me':''}">
+ out.innerHTML = groups.map(g=>`
+  <div class="yeargrp"><h3>${M[g.m-1]} ${g.y} <span class="cnt">${g.items.length} retirement</span></h3>
+   ${g.items.map(o=>`<div class="tl-item ${o.me?'me':''}">
      <span class="tl-date">${fmtR(o.ret)}</span>
      <span class="tl-name">${o.nm}${o.me?' ⭐':''}</span>
      <span class="badge b-blue">${CN[o.c]}</span>
@@ -480,7 +531,7 @@ function renderTimeline(){
 
 /* ============ PSO PROJECTION ============ */
 function renderPSO(){
- const posts = parseInt(document.getElementById("psoPosts").value)||3;
+ const posts = parseInt(document.getElementById("psoPosts").value)||4;
  const yr = parseInt(document.getElementById("psoYear").value)||2029;
  RA = parseInt(document.getElementById("raInput").value)||62;
 
@@ -515,90 +566,281 @@ function renderPSO(){
  document.getElementById("psoOut").innerHTML = html;
 }
 
+/* ===== रोमन (अंग्रेज़ी) में नाम खोजने की सुविधा =====
+   देवनागरी नाम को रोमन में बदलकर, उच्चारण-भेद सहने योग्य key बनाई जाती है,
+   ताकि "rawate/ravate", "tikuram/teekuram", "panka/panaka" सब चल जाएँ।   */
+const _RC={'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'n','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'n',
+'ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n',
+'प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','ळ':'l',
+'श':'sh','ष':'sh','स':'s','ह':'h','क़':'q','ख़':'kh','ग़':'g','ज़':'z','ड़':'r','ढ़':'rh','फ़':'f'};
+const _RV={'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au','ऑ':'o'};
+const _RM={'ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ॉ':'o','ॅ':'e'};
+function toRoman(s){
+  let out="";
+  for(let i=0;i<s.length;i++){
+    let ch=s[i];
+    if(s[i+1]==="़" && _RC[ch+"़"]){ ch=ch+"़"; i++; }
+    if(_RC[ch]){
+      out+=_RC[ch];
+      const nx=s[i+1];
+      if(nx==="्"){ i++; }
+      else if(_RM[nx]!==undefined){ out+=_RM[nx]; i++; }
+      else if(nx==="ं"||nx==="ँ"){ out+="an"; i++; }
+      else out+="a";
+      continue;
+    }
+    if(_RV[ch]){ out+=_RV[ch]; continue; }
+    if(ch==="ं"||ch==="ँ"){ out+="n"; continue; }
+    if(ch==="ः"){ out+="h"; continue; }
+    if(ch===" "||ch==="."||ch==="-"){ out+=" "; continue; }
+  }
+  return out;
+}
+const _normR = t => t.toLowerCase().replace(/[^a-z ]/g,"")
+  .replace(/w/g,"v").replace(/z/g,"j").replace(/aa/g,"a").replace(/ee/g,"i")
+  .replace(/oo/g,"u").replace(/ii/g,"i").replace(/uu/g,"u").replace(/(.)\1+/g,"$1");
+const _skelR = t => _normR(t).replace(/[aeiou ]/g,"");
+const _hasDeva = t => /[ऀ-ॿ]/.test(t);
+const _rkCache = {};
+function romanKeys(txt){
+  if (!_rkCache[txt]){
+    const r = _normR(toRoman(txt));
+    _rkCache[txt] = {k:r, w:r.split(" ").filter(Boolean).map(x=>x.replace(/[aeiou]/g,""))};
+  }
+  return _rkCache[txt];
+}
+/* देवनागरी query → सीधा मिलान; रोमन query → उच्चारण-आधारित मिलान */
+function nameMatch(txt, q){
+  if (!q) return true;
+  if (_hasDeva(q)) return txt.indexOf(q) >= 0;
+  const nq = _normR(q); if (!nq) return true;
+  if (nq.length < 2) return false;        // एक अक्षर की खोज अर्थहीन
+  const kk = romanKeys(txt);
+  if (kk.k.indexOf(nq) >= 0) return true;              // सीधा उच्चारण मिलान
+  const sq = _skelR(q);                                 // व्यंजन-ढाँचा (schwa-भेद हेतु)
+  return sq.length >= 3 && kk.w.some(w => w.indexOf(sq) === 0);
+}
+
 /* ============ PROMOTION CHAIN ============ */
-function renderChain(){
- RA = parseInt(document.getElementById("raInput").value)||62;
- const till = parseInt(document.getElementById("chTill").value);
- const psoPosts = parseInt(document.getElementById("psoPosts").value)||3;
- const psoYear = parseInt(document.getElementById("psoYear").value)||2029;
-
- // संवर्ग-वार working pool, वरिष्ठता = पदक्रम सूची क्रमांक
+/* ---- शुद्ध गणना engine: एक ही जगह सारे नियम; chain व search दोनों इसी से चलते हैं ----
+   लौटाता है: { ev: [संरचित events], promo: {नाम -> [पदोन्नतियाँ]} }                */
+function simulateChain(till, psoPosts, psoYear, data){
+ const SRC = data || {OFF:OFF, CADRES:CADRES};
  const pool = {};
- ORDER.forEach(k=>{ pool[k] = withRet(OFF.filter(o=>o.c===k)).sort((a,b)=>a.n-b.n); });
+ ORDER.forEach(k=>{ pool[k] = withRet(SRC.OFF.filter(o=>o.c===k)).sort((a,b)=>a.n-b.n); });
 
- // रिक्तियाँ अब "कारण" सहित रखी जाती हैं
  const vac = {};
- CADRES.forEach(c=>{
+ SRC.CADRES.forEach(c=>{
    vac[c.key] = [];
-   for(let i=0; i<c.sanctioned-c.filled; i++) vac[c.key].push("मौजूदा रिक्त पद (01.04.2026 की स्थिति)");
+   const newP = c.newP||0;
+   const oldVac = Math.max(0, (c.sanctioned - newP) - c.filled);
+   for(let i=0; i<oldVac; i++) vac[c.key].push({txt:"मौजूदा रिक्त पद (पूर्व रिक्ति/सेवानिवृत्ति)", kind:"old"});
  });
  vac["PSO"] = []; // PSO पद psoYear में खुलेंगे
 
- const outEl = document.getElementById("chainOut");
- let out = "";
-
+ const ev = [], promo = {};
  for(let y=2026; y<=till; y++){
-  let events = [];
-  // PSO पद इस वर्ष खुलते हैं
+  if (y === 2027){
+    let newList = [];
+    SRC.CADRES.forEach(c=>{
+      if (c.key !== "PSO" && (c.newP||0) > 0){
+        for(let i=0; i<c.newP; i++) vac[c.key].push({txt:"नवीन सृजित पद (जनवरी 2027 से)", kind:"new"});
+        newList.push(`${c.name}: ${c.newP}`);
+      }
+    });
+    if (newList.length) ev.push({t:"new", y, list:newList.join(" · ")});
+  }
   if (y === psoYear){
-    for(let i=0;i<psoPosts;i++) vac["PSO"].push("PSO का रिक्त पद");
-    events.push(`<div class="step">🎯 <strong>PSO के ${psoPosts} पद</strong> इस वर्ष SSO से पदोन्नति द्वारा भरे जाने का projection।</div>`);
+    for(let i=0;i<psoPosts;i++) vac["PSO"].push({txt:"PSO का रिक्त पद", kind:"pso"});
+    ev.push({t:"pso", y, posts:psoPosts});
   }
   // इस वर्ष के retirements → कारण सहित रिक्ति
   ORDER.forEach(k=>{
-    const retiring = pool[k].filter(o=>o.ret.y===y && (y>2026 || o.ret.m>=4));
-    retiring.forEach(o=>{
-      events.push(`<div class="step">👋 <strong>${o.nm}</strong> (${CN[k]}) — ${fmtR(o.ret)} को retire → <span class="badge b-saf">${CN[k]} में 1 पद रिक्त</span></div>`);
-      vac[k].push(`${o.nm} के retirement`);
+    pool[k].filter(o=>o.ret.y===y && (y>2026 || o.ret.m>=4)).forEach(o=>{
+      ev.push({t:"ret", y, k, nm:o.nm, ret:o.ret});
+      vac[k].push({txt:`${o.nm} के retirement`, kind:"ret", who:o.nm, when:fmtR(o.ret), cadre:k});
       pool[k] = pool[k].filter(x=>x!==o);
     });
   });
-  // ऊपर से नीचे cascade — हर promotion का "कारण" दिखाते हुए
+  // ऊपर से नीचे cascade
   for(let i=ORDER.length-1; i>=1; i--){
     const up = ORDER[i], down = ORDER[i-1];
-    // सेवा से बाहर हो चुके officers हटाएँ (उनका पद रिक्त गिना जा चुका)
     pool[down] = pool[down].filter(cand=> cand.ret.y >= y);
     while(vac[up].length > 0){
       const idx = pool[down].findIndex(cand => eligByYear(cand, up, y));
       if (idx === -1){
         if (pool[down].length > 0 || vac[up].length > 0)
-          events.push(`<div class="step" style="color:var(--muted)">⏸️ ${CN[up]} में ${vac[up].length} पद रिक्त — ${CN[down]} में अभी कोई पात्र officer नहीं (${REQ[up]} वर्ष सेवा अवधि अपूर्ण / promotion से बाहर) — रिक्ति अगले वर्ष carry होगी।</div>`);
+          ev.push({t:"hold", y, up, down, n:vac[up].length});
         break;
       }
-      const cause = vac[up].shift(); // यह पद किस कारण रिक्त हुआ
+      const cause = vac[up].shift();
       const cand = pool[down].splice(idx,1)[0];
-      cand.cd = `31-12-${String(y).slice(2)}`; // नई अर्हता गणना हेतु
+      cand.cd = `31-12-${String(y).slice(2)}`;
       cand.c = up; pool[up].push(cand);
-      vac[down].push(`${cand.nm} की पदोन्नति`); // इनका पुराना पद अब रिक्त
-      events.push(`<div class="step">⬆️ <span class="badge b-saf">${cause} से रिक्त</span> ${CN[up]} पद पर — <strong>${cand.nm}</strong>${cand.me?' ⭐':''} (${CN[down]}, वरिष्ठता क्र. ${cand.n}) <span class="arrow">→</span> <strong>${CN[up]}</strong> promote</div>`);
+      vac[down].push({txt:`${cand.nm} की पदोन्नति`, kind:"promo", who:cand.nm, when:`वर्ष ${y}`, cadre:down});
+      ev.push({t:"promo", y, up, down, nm:cand.nm, n:cand.n, me:cand.me, cause});
+      (promo[cand.nm] = promo[cand.nm] || []).push({y, up, down, cause});
     }
   }
-  if (events.length){
-    out += `<div class="chainyr"><h3>वर्ष ${y}</h3><div class="body">${events.join("")}</div></div>`;
-  } else {
-    out += `<div class="chainyr"><h3>वर्ष ${y}</h3><div class="body"><div class="step" style="color:var(--muted)">कोई retirement/promotion event projected नहीं।</div></div></div>`;
-  }
  }
+ return {ev, promo};
+}
+
+/* ---- कारण को पढ़ने योग्य वाक्य में बदलें ---- */
+function causeText(c){
+  if (!c) return "—";
+  if (c.kind === "ret")   return `${c.who} (${CN[c.cadre]}) की सेवानिवृत्ति ${c.when}`;
+  if (c.kind === "promo") return `${c.who} (${CN[c.cadre]}) की पदोन्नति ${c.when}`;
+  if (c.kind === "new")   return "नवीन सृजित पद (जनवरी 2027 से)";
+  if (c.kind === "pso")   return "प्रधान स्टॉफ ऑफिसर का रिक्त पद";
+  return c.txt || "मौजूदा रिक्त पद";
+}
+/* वर्ष को bold व रंगीन चिप में दिखाएँ — जितना निकट, उतना गहरा हरा */
+function yrChip(y){
+  const d = y - (new Date()).getFullYear();
+  const cls = d <= 3 ? "near" : d <= 8 ? "mid" : d <= 14 ? "far" : "vfar";
+  return `<span class="yr ${cls}">${y}</span>`;
+}
+const causeBadge = c => !c ? "" : (c.kind==="ret" ? "b-red" : c.kind==="promo" ? "b-blue" : "b-green");
+
+/* ---- "पुराना setup" = नवीन पद सृजन से पूर्व की स्थापना
+       प्रधान स्टॉफ ऑफिसर 03, वरिष्ठ स्टॉफ ऑफिसर 06, स्टॉफ ऑफिसर 12, निज सचिव 30
+       "नया setup" = नवीन 07 पद सहित — 04, 08, 14, 32
+       अधिकारियों का data दोनों में समान (वर्तमान वास्तविक स्थिति)।            ---- */
+function oldSetupData(){
+  const cad = CADRES.map(c=>Object.assign({}, c, {
+    sanctioned: c.sanctioned - (c.newP||0),   // नवीन पद हटाकर मूल स्वीकृत
+    newP: 0
+  }));
+  return {OFF:OFF, CADRES:cad};
+}
+const oldPsoPosts = p => Math.max(0, p - ((CADRES.find(c=>c.key==="PSO")||{}).newP||0));
+
+/* ---- search हेतु cache (RA/PSO settings बदलने पर दोबारा गणना) ---- */
+let _simCache = null, _simOld = null, _simKey = "";
+function getSim(){
+  const psoPosts = parseInt(document.getElementById("psoPosts").value)||4;
+  const psoYear  = parseInt(document.getElementById("psoYear").value)||2029;
+  const key = `${RA}|${psoPosts}|${psoYear}`;
+  if (_simKey !== key || !_simCache){
+    _simCache = simulateChain(2055, psoPosts, psoYear);
+    _simOld   = simulateChain(2055, oldPsoPosts(psoPosts), psoYear, oldSetupData());
+    _simKey   = key;
+  }
+  return {nw:_simCache, old:_simOld};
+}
+
+function renderChain(){
+ RA = parseInt(document.getElementById("raInput").value)||62;
+ _simKey = ""; // RA बदला हो सकता है
+ const range = (document.getElementById("chTill").value||"2026-2030").split("-");
+ const from = parseInt(range[0])||2026, till = parseInt(range[1])||2030;
+ const psoPosts = parseInt(document.getElementById("psoPosts").value)||4;
+ const psoYear = parseInt(document.getElementById("psoYear").value)||2029;
+
+ const q = (document.getElementById("chQ").value||"").trim();
+ const {ev} = simulateChain(till, psoPosts, psoYear);
+
+ /* नाम दिया हो तो केवल उसी officer से जुड़े events — उनकी अपनी पदोन्नतियाँ,
+    उनकी सेवानिवृत्ति, तथा वे पदोन्नतियाँ जो उनके हटने/बढ़ने से संभव हुईं */
+ const hit = e => !q || (
+      (e.nm && nameMatch(e.nm, q)) ||
+      (e.cause && e.cause.who && nameMatch(e.cause.who, q))
+ );
+ const shown = ev.filter(hit);
+ const byYear = {};
+ shown.forEach(e=>{ (byYear[e.y] = byYear[e.y] || []).push(e); });
+
+ /* खोजे गए नाम का सार-पत्रक */
+ let card = "", qFound = true;
+ if (q){
+   const who = OFF.filter(o=>nameMatch(o.nm, q));
+   if (!who.length){
+     qFound = false;
+     card = `<div class="note" style="border-left-color:var(--red)">❌ "<strong>${q}</strong>" नाम का कोई officer सूची में नहीं मिला।</div>`;
+   } else {
+     card = who.map(o=>{
+       const r = retireDate(o.dob, RA);
+       const mine = ev.filter(e=>e.t==="promo" && e.nm===o.nm)
+                      .map(e=>`<div class="step">⬆️ <strong>${CN[e.up]}</strong> — ${yrChip(e.y)} <span class="badge ${causeBadge(e.cause)}">${causeText(e.cause)} से रिक्त</span></div>`).join("");
+       const caused = ev.filter(e=>e.t==="promo" && e.cause && e.cause.who===o.nm)
+                        .map(e=>`<div class="step">↪️ इनके हटने से — <strong>${e.nm}</strong> की पदोन्नति ${CN[e.up]} पद पर, ${yrChip(e.y)}</div>`).join("");
+       return `<div class="chainyr"><h3>🔍 ${o.nm}${o.me?' ⭐':''} — ${CN[o.c]}, वरिष्ठता क्र. ${o.n}</h3><div class="body">
+         <div class="step">🎂 जन्मतिथि ${fmtDMY(o.dob)} · संवर्ग नियुक्ति ${fmtDMY(o.cd)} · सेवानिवृत्ति <strong>${fmtR(r)}</strong></div>
+         ${o.np ? '<div class="step"><span class="badge b-red">promotion से बाहर</span> — इनकी पदोन्नति projection में नहीं दिखाई जाती।</div>' : ''}
+         ${mine || (o.np ? '' : '<div class="step" style="color:var(--muted)">चुनी गई अवधि/गणना में इनकी कोई पदोन्नति projected नहीं।</div>')}
+         ${caused ? `<div class="step" style="color:var(--muted);margin-top:6px"><strong>इनके कारण बनी रिक्तियाँ:</strong></div>${caused}` : ""}
+       </div></div>`;
+     }).join("");
+   }
+ }
+
+ let out = "";
+ for(let y=from; y<=till; y++){
+  const list = (byYear[y]||[]).map(e=>{
+   if (e.t==="new")   return `<div class="step">🆕 <strong>नवीन सृजित पद जनवरी 2027 से promotion हेतु उपलब्ध</strong> — ${e.list}</div>`;
+   if (e.t==="pso")   return `<div class="step">🎯 <strong>PSO के ${e.posts} पद</strong> (03 पूर्व + 01 नवीन सृजित) इस वर्ष SSO से पदोन्नति द्वारा भरे जाने का projection।</div>`;
+   if (e.t==="ret")   return `<div class="step">👋 <strong>${e.nm}</strong> (${CN[e.k]}) — ${fmtR(e.ret)} को retire → <span class="badge b-saf">${CN[e.k]} में 1 पद रिक्त</span></div>`;
+   if (e.t==="hold")  return `<div class="step" style="color:var(--muted)">⏸️ ${CN[e.up]} में ${e.n} पद रिक्त — ${CN[e.down]} में अभी कोई पात्र officer नहीं (${REQ[e.up]} वर्ष सेवा अवधि अपूर्ण / promotion से बाहर) — रिक्ति अगले वर्ष carry होगी।</div>`;
+   return `<div class="step">⬆️ <span class="badge b-saf">${causeText(e.cause)} से रिक्त</span> ${CN[e.up]} पद पर — <strong>${e.nm}</strong>${e.me?' ⭐':''} (${CN[e.down]}, वरिष्ठता क्र. ${e.n}) <span class="arrow">→</span> <strong>${CN[e.up]}</strong> promote ${yrChip(e.y)}</div>`;
+  }).join("");
+  if (q && !list) continue;   // खोज के समय खाली वर्ष छोड़ दें
+  out += `<div class="chainyr"><h3>वर्ष ${yrChip(y)}</h3><div class="body">${list || '<div class="step" style="color:var(--muted)">कोई retirement/promotion event projected नहीं।</div>'}</div></div>`;
+ }
+ if (q && qFound && !out) out = `<div class="note">इस अवधि (${from}–${till}) में "<strong>${q}</strong>" से जुड़ा कोई event नहीं — दूसरी Projection अवधि चुनकर देखें।</div>`;
+ out = card + out;
+ out = `<p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">${q?`🔍 खोज: <strong>${q}</strong> · `:""}📅 प्रदर्शित अवधि: <strong>${from}–${till}</strong> (promotion क्रम की गणना 2026 से निरंतर की गई है — ${from>2026?'पूर्व वर्षों की पदोन्नतियाँ लागू मानकर':'प्रारंभ से'})</p>` + out;
  out += `<p style="font-size:.82rem;color:var(--muted)">⭐ = श्री टीकूराम रावटे। <strong>Promotion से बाहर:</strong> श्री जगदीश नारायण कोष्टा (निज सचिव), श्री भुवन डेकाटे एवं श्री धन्नूदास बुरडे (निज सहायक), श्री भुवन लाल मरसकोले (स्टेनो टाइपिस्ट) — ये अपने वर्तमान संवर्ग में ही रहेंगे (retirement तक); श्री पुरुषोत्तम कोष्टा का प्रकरण मान. उच्च न्यायालय में लंबित होने से सूची में शामिल नहीं। स्टेनो टाइपिस्ट → शीघ्रलेखक पदोन्नति में शीघ्रलेखक की 42 मौजूदा रिक्तियाँ भी शामिल हैं (परिवीक्षा/परीक्षा शर्तें लागू हो सकती हैं)। यह projection वरिष्ठता-आधारित indicative है — DPC, roster एवं पात्रता नियम final निर्णय करेंगे।</p>`;
- outEl.innerHTML = out;
+ document.getElementById("chainOut").innerHTML = out;
+ renderSearch(); // search की अगली-पदोन्नति भी ताज़ा रखें
 }
 
 /* ============ SEARCH ============ */
 function renderSearch(){
  const q = (document.getElementById("q").value||"").trim();
  const cf = document.getElementById("fCadre").value, df = document.getElementById("fDist").value;
- const tb = document.querySelector("#offTbl tbody");
- const rows = withRet(OFF).filter(o=>
-   (!cf||o.c===cf) && (!df||o.d===df) &&
-   (!q || o.nm.includes(q) || o.p.includes(q))
+ const pf = (document.getElementById("fPromo")||{value:""}).value;
+ const sim = getSim(), promo = sim.nw.promo, promoOld = sim.old.promo;
+
+ const rows = withRet(OFF).map(o=>{
+   const nx  = (promo[o.nm]||[])[0] || null;      // नया setup — पहली आगामी पदोन्नति
+   const nxO = (promoOld[o.nm]||[])[0] || null;   // पुराना setup
+   return Object.assign({}, o, {nx, nxO, nxCause: nx ? causeText(nx.cause) : ""});
+ }).filter(o=>
+   (!cf || o.c===cf) && (!df || o.d===df) &&
+   (!pf || (pf==="none" ? !o.nx : (o.nx && o.nx.cause && o.nx.cause.kind===pf))) &&
+   (!q || nameMatch(o.nm,q) || o.p.includes(q) || nameMatch(o.nxCause,q) || o.nxCause.includes(q) || (o.nx && CN[o.nx.up].includes(q)))
  );
- tb.innerHTML = rows.length ? rows.map(o=>`<tr class="${o.me?'me':''}">
+
+ const tb = document.querySelector("#offTbl tbody");
+ tb.innerHTML = rows.length ? rows.map(o=>{
+   const nxCell = o.nx
+     ? `<span class="badge b-blue">${CN[o.nx.up]}</span><br>${yrChip(o.nx.y)}`
+     : (o.np ? '<span class="badge b-red">promotion से बाहर</span>'
+             : '<span class="badge b-saf">सेवानिवृत्ति तक पदोन्नति projected नहीं</span>');
+   const oldCell = o.nxO
+     ? `<span class="badge b-blue">${CN[o.nxO.up]}</span><br>${yrChip(o.nxO.y)}`
+     : '<span style="color:var(--muted)">—</span>';
+   let diffCell = '<span style="color:var(--muted)">—</span>';
+   if (o.nx && o.nxO){
+     const d = o.nxO.y - o.nx.y;   // धनात्मक = नए setup में जल्दी
+     diffCell = d === 0 ? '<span class="badge b-green">समान</span>'
+              : d > 0   ? `<span class="badge b-green">${d} वर्ष जल्दी</span>`
+                        : `<span class="badge b-saf">${-d} वर्ष बाद</span>`;
+   } else if (o.nx && !o.nxO){ diffCell = '<span class="badge b-green">केवल नए में</span>'; }
+   else if (!o.nx && o.nxO){ diffCell = '<span class="badge b-saf">केवल पुराने में</span>'; }
+   const causeCell = o.nx
+     ? `<span class="badge ${causeBadge(o.nx.cause)}">${o.nxCause}</span>`
+     : '<span style="color:var(--muted)">—</span>';
+   return `<tr class="${o.me?'me':''}">
    <td>${o.n}</td><td><strong>${o.nm}</strong>${o.me?' ⭐':''}${o.np?' <span class="badge b-red">promotion से बाहर</span>':''}</td>
    <td><span class="badge b-blue">${CN[o.c]}</span></td>
+   <td>${nxCell}</td><td>${oldCell}</td><td>${diffCell}</td><td style="min-width:200px">${causeCell}</td>
    <td>${fmtDMY(o.dob)}</td><td>${fmtDMY(o.cd)}</td><td>${o.d}</td>
    <td><span class="badge ${o.ret.y<=2028?'b-red':(o.ret.y<=2032?'b-saf':'b-green')}">${fmtR(o.ret)}</span></td>
-   <td>${o.p}</td></tr>`).join("")
-  : `<tr><td colspan="8"><div class="empty">कोई officer नहीं मिला — खोज शब्द बदलकर देखें।</div></td></tr>`;
+   <td>${o.p}</td></tr>`;
+ }).join("")
+  : `<tr><td colspan="12"><div class="empty">कोई officer नहीं मिला — खोज शब्द बदलकर देखें।</div></td></tr>`;
 }
 
 /* ============ PDF UPLOAD (pdf.js) ============ */
@@ -653,7 +895,10 @@ async function handlePDF(file){
  document.getElementById("raGo").addEventListener("click",()=>{renderTimeline();});
  document.getElementById("psoGo").addEventListener("click",()=>{renderPSO();});
  document.getElementById("chGo").addEventListener("click",()=>{renderChain();});
- ["q","fCadre","fDist"].forEach(id=>document.getElementById(id).addEventListener("input",renderSearch));
+ document.getElementById("chQ").addEventListener("input",()=>{renderChain();});
+ document.getElementById("chQ").addEventListener("keydown",e=>{ if(e.key==="Enter") renderChain(); });
+ document.getElementById("chClear").addEventListener("click",()=>{ document.getElementById("chQ").value=""; renderChain(); });
+ ["q","fCadre","fDist","fPromo"].forEach(id=>document.getElementById(id).addEventListener("input",renderSearch));
 
  renderOverview(); renderTimeline(); renderPSO(); renderChain(); renderSearch();
 })();
